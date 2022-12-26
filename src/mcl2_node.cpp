@@ -58,9 +58,56 @@ void Mcl2Node::initPubSub()
     "scan", 1, std::bind(&Mcl2Node::receiveScan, this, std::placeholders::_1));
 }
 
-void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg){};
+void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
+{
+  if (not initialpose_receive_) {
+    initTf();
+    initMcl(msg);
+    // getOdom2RobotPose(current_pose_);
+    // old_pose_ = current_pose_;
+
+    initialpose_receive_ = true;
+  } else {
+    initMcl(msg);
+  }
+};
 void Mcl2Node::receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg){};
 void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg){};
+
+void Mcl2Node::initTf()
+{
+  tf_broadcaster_.reset();
+  tf_listener_.reset();
+  tf_buffer_.reset();
+
+  tf_buffer_ = std::make_shared<tf2_ros::Buffer>(get_clock());
+  auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
+    get_node_base_interface(), get_node_timers_interface(),
+    create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive, false));
+  tf_buffer_->setCreateTimerInterface(timer_interface);
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+  tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(shared_from_this());
+
+  latest_tf_ = tf2::Transform::getIdentity();
+}
+
+void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
+{
+  alpha1_ = 0.2;
+  alpha2_ = 0.2;
+  alpha3_ = 0.2;
+  alpha4_ = 0.03;
+
+  nav2_msgs::msg::Particle p;
+  nav2_msgs::msg::ParticleCloud pc_reset;
+  pc_ = pc_reset;
+  pc_.set__header(pose->header);
+  p.set__pose(pose->pose.pose);
+  p.set__weight(1. / 500.);
+  for (size_t i = 0; i < 500; i++) {
+    pc_.particles.push_back(p);
+  }
+}
 
 }  // namespace mcl2
 

@@ -32,9 +32,6 @@ public:
   ~Mcl2Node();
 
 private:
-  // パブリッシャ・サブスクライバ初期化用
-  void initPubSub();
-
   // サブスクライバの登録
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::ConstSharedPtr
     initial_pose_sub_;
@@ -49,9 +46,25 @@ private:
   rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr
     maximum_likelihood_particles_publisher_;
 
-  void receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
-  void receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg);
-  void receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg);
+  void receiveInitialPose(
+    geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);  //初期位置の受取
+  void receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg);  // 尤度場作成用のマップの受取
+  void receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg);  // LiDARからのデータの受取
+
+  void initPubSub();  // パブリッシャ・サブスクライバ初期化用
+  void initTf();      //tf関連の初期化
+  void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);
+
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
+  tf2::Transform latest_tf_;
+
+  nav2_msgs::msg::ParticleCloud pc_;  //パーティクル群
+  bool initialpose_receive_;          //初期位置を受け取ったかのフラグ
+
+  // Mcl2用のパラメータ
+  double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差パラメータ
 };
 }  // namespace mcl2
 
