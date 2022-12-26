@@ -28,13 +28,13 @@ namespace mcl2
 
 Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options) : Node("mcl2_node", options)
 {
-  RCLCPP_INFO(this->get_logger(), "Start Mcl2Node");
+  RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
 }
 Mcl2Node::~Mcl2Node() {}
 
 void Mcl2Node::initPubSub()
 {
-  RCLCPP_INFO(get_logger(), "initPubSub");
+  RCLCPP_INFO(get_logger(), "Run initPubSub");
 
   particle_cloud_pub_ = create_publisher<nav2_msgs::msg::ParticleCloud>("particle_cloud", 2);
   likelihood_map_pub_ = create_publisher<nav_msgs::msg::OccupancyGrid>("likelihood_map", 2);
@@ -54,6 +54,8 @@ void Mcl2Node::initPubSub()
 
 void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
 {
+  RCLCPP_INFO(get_logger(), "Run receiveInitialPose");
+
   if (not initialpose_receive_) {
     initTf();
     initMcl(msg);
@@ -70,6 +72,8 @@ void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg){};
 
 void Mcl2Node::initTf()
 {
+  RCLCPP_INFO(get_logger(), "Run initTf");
+
   tf_broadcaster_.reset();
   tf_listener_.reset();
   tf_buffer_.reset();
@@ -87,6 +91,8 @@ void Mcl2Node::initTf()
 
 void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
 {
+  RCLCPP_INFO(get_logger(), "Run initMcl");
+
   alpha1_ = 0.2;
   alpha2_ = 0.2;
   alpha3_ = 0.2;
