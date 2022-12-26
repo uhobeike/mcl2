@@ -31,7 +31,27 @@ public:
   explicit Mcl2Node(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
   ~Mcl2Node();
 
-protected:
+private:
+  // パブリッシャ・サブスクライバ初期化用
+  void initPubSub();
+
+  // サブスクライバの登録
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::ConstSharedPtr
+    initial_pose_sub_;
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::ConstSharedPtr map_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::ConstSharedPtr scan_sub_;
+
+  // パブリッシャの登録
+  rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr particle_cloud_pub_;
+  rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr likelihood_map_pub_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr marginal_likelihood_publisher_;
+  rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr
+    maximum_likelihood_particles_publisher_;
+
+  void receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
+  void receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg);
+  void receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg);
 };
 }  // namespace mcl2
 
