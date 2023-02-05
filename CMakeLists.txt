@@ -14,8 +14,8 @@ include_directories(include)
 ament_auto_add_library(mcllib SHARED
   src/mcl/likelihoodField.cpp
   src/mcl/mcl.cpp
-  src/mcl/motionModelUpdate.cpp
-  src/mcl/observationModelUpdate.cpp
+  src/mcl/motionModel.cpp
+  src/mcl/observationModel.cpp
   src/mcl/resampling.cpp
 )
 

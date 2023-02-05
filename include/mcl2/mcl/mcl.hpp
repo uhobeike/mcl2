@@ -2,8 +2,8 @@
 #include <vector>
 
 #include "mcl2/mcl/likelihoodField.hpp"
-#include "mcl2/mcl/motionModelUpdate.hpp"
-#include "mcl2/mcl/observationModelUpdate.hpp"
+#include "mcl2/mcl/motionModel.hpp"
+#include "mcl2/mcl/observationModel.hpp"
 #include "mcl2/mcl/particle.hpp"
 #include "mcl2/mcl/resampling.hpp"
 
@@ -21,8 +21,8 @@ public:
   void release_pointers();
 
   std::shared_ptr<LikelihoodField> likelihood_field_;
-  std::shared_ptr<MotionModelUpdate> motion_model_update_;
-  std::shared_ptr<ObservationModelUpdate> observation_model_update_;
+  std::shared_ptr<MotionModel> motion_model_;
+  std::shared_ptr<ObservationModel> observation_model_;
   std::shared_ptr<Resampling> resampling_;
 
   void initParticles(double ini_pose_x, double ini_pose_y, double ini_pose_yaw, int particle_size);

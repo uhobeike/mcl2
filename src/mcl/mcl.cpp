@@ -12,8 +12,8 @@ Mcl::Mcl(
   release_pointers();
 
   likelihood_field_ = std::make_shared<LikelihoodField>(likelihood_dist);
-  motion_model_update_ = std::make_shared<MotionModelUpdate>();
-  observation_model_update_ = std::make_shared<ObservationModelUpdate>();
+  motion_model_ = std::make_shared<MotionModel>();
+  observation_model_ = std::make_shared<ObservationModel>();
   resampling_ = std::make_shared<Resampling>();
 }
 
@@ -37,8 +37,8 @@ void Mcl::initParticles(
 void Mcl::release_pointers()
 {
   likelihood_field_.reset();
-  motion_model_update_.reset();
-  observation_model_update_.reset();
+  motion_model_.reset();
+  observation_model_.reset();
   resampling_.reset();
 }
 
