@@ -100,15 +100,24 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
   alpha3_ = 0.2;
   alpha4_ = 0.03;
 
-  nav2_msgs::msg::Particle p;
-  nav2_msgs::msg::ParticleCloud pc_reset;
-  pc_ = pc_reset;
-  pc_.set__header(pose->header);
-  p.set__pose(pose->pose.pose);
-  p.set__weight(1. / 500.);
-  for (size_t i = 0; i < 500; i++) {
-    pc_.particles.push_back(p);
-  }
+  particle_size_ = 500;
+
+  likelihood_dist_ = 2.0;
+
+  mcl_.reset();
+  mcl_ = std::make_shared<mcl::Mcl>(
+    pose->pose.pose.position.x, pose->pose.pose.position.y, 0.0, alpha1_, alpha2_, alpha3_, alpha4_,
+    particle_size_, likelihood_dist_);
+
+  // nav2_msgs::msg::Particle p;
+  // nav2_msgs::msg::ParticleCloud pc_reset;
+  // pc_ = pc_reset;
+  // pc_.set__header(pose->header);
+  // p.set__pose(pose->pose.pose);
+  // p.set__weight(1. / 500.);
+  // for (size_t i = 0; i < 500; i++) {
+  //   pc_.particles.push_back(p);
+  // }
 }
 
 void Mcl2Node::loopMcl()

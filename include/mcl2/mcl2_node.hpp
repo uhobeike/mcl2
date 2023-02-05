@@ -13,6 +13,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
+#include "mcl2/mcl/mcl.hpp"
 #include "nav2_msgs/msg/particle_cloud.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
@@ -66,6 +67,10 @@ private:
 
   // Mcl2用のパラメータ
   double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差パラメータ
+  double particle_size_;
+  double likelihood_dist_;
+
+  std::shared_ptr<mcl::Mcl> mcl_;
 };
 }  // namespace mcl2
 
