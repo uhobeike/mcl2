@@ -29,6 +29,7 @@ namespace mcl2
 Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options) : Node("mcl2_node", options)
 {
   RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
+  initPubSub();
 }
 Mcl2Node::~Mcl2Node() {}
 
@@ -57,12 +58,14 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
   RCLCPP_INFO(get_logger(), "Run receiveInitialPose");
 
   if (not initialpose_receive_) {
+    initialpose_receive_ = true;
+
     initTf();
     initMcl(msg);
+    loopMcl();
     // getOdom2RobotPose(current_pose_);
     // old_pose_ = current_pose_;
 
-    initialpose_receive_ = true;
   } else {
     initMcl(msg);
   }
@@ -85,7 +88,6 @@ void Mcl2Node::initTf()
   tf_buffer_->setCreateTimerInterface(timer_interface);
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(shared_from_this());
-
   latest_tf_ = tf2::Transform::getIdentity();
 }
 
@@ -106,6 +108,15 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
   p.set__weight(1. / 500.);
   for (size_t i = 0; i < 500; i++) {
     pc_.particles.push_back(p);
+  }
+}
+
+void Mcl2Node::loopMcl()
+{
+  rclcpp::WallRate loop_rate(100ms);
+  while (rclcpp::ok() && initialpose_receive_) {
+    RCLCPP_INFO(get_logger(), "Run loop_mcl");
+    loop_rate.sleep();
   }
 }
 

@@ -53,7 +53,8 @@ private:
 
   void initPubSub();  // パブリッシャ・サブスクライバ初期化用
   void initTf();      //tf関連の初期化
-  void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);
+  void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);  //Mclの初期化
+  void loopMcl();                                                               //Mclのループ
 
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
