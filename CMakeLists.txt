@@ -12,6 +12,7 @@ ament_auto_find_build_dependencies()
 include_directories(include)
 
 ament_auto_add_library(mcllib SHARED
+  src/mcl/likelihoodField.cpp
   src/mcl/mcl.cpp
   src/mcl/motionModelUpdate.cpp
   src/mcl/observationModelUpdate.cpp
