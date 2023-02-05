@@ -66,11 +66,11 @@ private:
   bool initialpose_receive_;          //初期位置を受け取ったかのフラグ
 
   // Mcl2用のパラメータ
-  double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差パラメータ
-  double particle_size_;
-  double likelihood_dist_;
+  double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差
+  double particle_size_;                      //パーティクルのサイズ
+  double likelihood_dist_;                    //尤度場の距離
 
-  std::shared_ptr<mcl::Mcl> mcl_;
+  std::shared_ptr<mcl::Mcl> mcl_;  //ROS依存がないMclオブジェクト
 };
 }  // namespace mcl2
 

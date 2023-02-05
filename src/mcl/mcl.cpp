@@ -1,7 +1,5 @@
 #include "mcl2/mcl/mcl.hpp"
 
-#include <iostream>
-
 namespace mcl
 {
 Mcl::Mcl(
@@ -10,10 +8,16 @@ Mcl::Mcl(
   int particle_size, double likelihood_dist)
 {
   initParticles(ini_pose_x, ini_pose_y, ini_pose_yaw, particle_size);
-  std::cout << particles_.size() << "\n";
+
+  release_pointers();
+
+  likelihood_field_ = std::make_shared<LikelihoodField>(likelihood_dist);
+  motion_model_update_ = std::make_shared<MotionModelUpdate>();
+  observation_model_update_ = std::make_shared<ObservationModelUpdate>();
+  resampling_ = std::make_shared<Resampling>();
 }
 
-Mcl::~Mcl() {}
+Mcl::~Mcl() { release_pointers(); }
 
 void Mcl::initParticles(
   double ini_pose_x, double ini_pose_y, double ini_pose_yaw, int particle_size)
@@ -28,6 +32,14 @@ void Mcl::initParticles(
   for (auto i = 0; i < particle_size; i++) {
     particles_[i] = p;
   }
+}
+
+void Mcl::release_pointers()
+{
+  likelihood_field_.reset();
+  motion_model_update_.reset();
+  observation_model_update_.reset();
+  resampling_.reset();
 }
 
 }  // namespace mcl
