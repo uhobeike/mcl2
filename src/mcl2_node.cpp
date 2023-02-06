@@ -10,6 +10,7 @@
 
 #include "nav2_util/geometry_utils.hpp"
 #include "nav2_util/string_utils.hpp"
+#include "nav_msgs/srv/get_map.hpp"
 #include "tf2/LinearMath/Transform.h"
 #include "tf2/convert.h"
 #include "tf2/time.h"
@@ -45,10 +46,11 @@ void Mcl2Node::initPubSub()
   maximum_likelihood_particles_publisher_ =
     create_publisher<nav2_msgs::msg::ParticleCloud>("maximum_likelihood_particles", 2);
 
+  map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>(
+    "map", rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable(),
+    std::bind(&Mcl2Node::receiveMap, this, std::placeholders::_1));
   initial_pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
     "initialpose", 1, std::bind(&Mcl2Node::receiveInitialPose, this, std::placeholders::_1));
-  map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>(
-    "map", 1, std::bind(&Mcl2Node::receiveMap, this, std::placeholders::_1));
   scan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
     "scan", 1, std::bind(&Mcl2Node::receiveScan, this, std::placeholders::_1));
 }
@@ -70,8 +72,9 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
     initMcl(msg);
   }
 };
-void Mcl2Node::receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg){};
+
 void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg){};
+void Mcl2Node::receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg) { map_ = *msg; }
 
 void Mcl2Node::initTf()
 {
@@ -102,36 +105,29 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
 
   particle_size_ = 500;
 
-  likelihood_dist_ = 2.0;
+  likelihood_dist_ = 20.0;
 
   mcl_.reset();
   mcl_ = std::make_shared<mcl::Mcl>(
     pose->pose.pose.position.x, pose->pose.pose.position.y, 0.0, alpha1_, alpha2_, alpha3_, alpha4_,
-    particle_size_, likelihood_dist_);
+    particle_size_, likelihood_dist_, map_.info.width, map_.info.height, map_.info.resolution,
+    map_.data);
 
-  // nav2_msgs::msg::Particle p;
-  // nav2_msgs::msg::ParticleCloud pc_reset;
-  // pc_ = pc_reset;
-  // pc_.set__header(pose->header);
-  // p.set__pose(pose->pose.pose);
-  // p.set__weight(1. / 500.);
-  // for (size_t i = 0; i < 500; i++) {
-  //   pc_.particles.push_back(p);
-  // }
+  mcl_->likelihood_field_->getLikelihoodField(map_.data);
+  likelihood_map_pub_->publish(map_);
 }
 
 void Mcl2Node::loopMcl()
 {
   rclcpp::WallRate loop_rate(100ms);
   while (rclcpp::ok() && initialpose_receive_) {
-    RCLCPP_INFO(get_logger(), "Run loop_mcl");
+    // RCLCPP_INFO(get_logger(), "Run loop_mcl");
     mcl_->motion_model_;
     mcl_->observation_model_;
     mcl_->resampling_;
     loop_rate.sleep();
   }
 }
-
 }  // namespace mcl2
 
 #include "rclcpp_components/register_node_macro.hpp"

@@ -5,13 +5,15 @@ namespace mcl
 Mcl::Mcl(
   double ini_pose_x, double ini_pose_y, double ini_pose_yaw, double alpha_trans_trans,
   double alpha_trans_rotate, double alpha_rotate_trans, double alpha_rotate_rotate,
-  int particle_size, double likelihood_dist)
+  int particle_size, double likelihood_dist, uint32_t map_width, uint32_t map_height,
+  double map_resolution, std::vector<int8_t> map_data)
 {
   initParticles(ini_pose_x, ini_pose_y, ini_pose_yaw, particle_size);
 
   release_pointers();
 
-  likelihood_field_ = std::make_shared<LikelihoodField>(likelihood_dist);
+  likelihood_field_ = std::make_shared<LikelihoodField>(
+    likelihood_dist, map_width, map_height, map_resolution, map_data);
   motion_model_ = std::make_shared<MotionModel>();
   observation_model_ = std::make_shared<ObservationModel>();
   resampling_ = std::make_shared<Resampling>();

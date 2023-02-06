@@ -65,6 +65,8 @@ private:
   nav2_msgs::msg::ParticleCloud pc_;  //パーティクル群
   bool initialpose_receive_;          //初期位置を受け取ったかのフラグ
 
+  nav_msgs::msg::OccupancyGrid map_;
+
   // Mcl2用のパラメータ
   double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差
   double particle_size_;                      //パーティクルのサイズ

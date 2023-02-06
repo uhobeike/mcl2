@@ -15,7 +15,8 @@ public:
   Mcl(
     double ini_pose_x, double ini_pose_y, double ini_pose_yaw, double alpha_trans_trans,
     double alpha_trans_rotate, double alpha_rotate_trans, double alpha_rotate_rotate,
-    int particle_size, double likelihood_dist);
+    int particle_size, double likelihood_dist, uint32_t map_width, uint32_t map_height,
+    double map_resolution, std::vector<int8_t> map_data);
   ~Mcl();
 
   void release_pointers();
