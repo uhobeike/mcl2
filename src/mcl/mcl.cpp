@@ -14,7 +14,8 @@ Mcl::Mcl(
 
   likelihood_field_ = std::make_shared<LikelihoodField>(
     likelihood_dist, map_width, map_height, map_resolution, map_data);
-  motion_model_ = std::make_shared<MotionModel>();
+  motion_model_ = std::make_shared<MotionModel>(
+    alpha_trans_trans, alpha_trans_rotate, alpha_rotate_trans, alpha_rotate_rotate);
   observation_model_ = std::make_shared<ObservationModel>();
   resampling_ = std::make_shared<Resampling>();
 }

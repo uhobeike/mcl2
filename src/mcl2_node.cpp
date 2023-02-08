@@ -121,8 +121,8 @@ void Mcl2Node::loopMcl()
 {
   rclcpp::WallRate loop_rate(100ms);
   while (rclcpp::ok() && initialpose_receive_) {
-    // RCLCPP_INFO(get_logger(), "Run loop_mcl");
-    mcl_->motion_model_;
+    RCLCPP_INFO(get_logger(), "Run loop_mcl");
+    mcl_->motion_model_->update(mcl_->particles_, 0, 0.001, 0.001, 0);
     mcl_->observation_model_;
     mcl_->resampling_;
     loop_rate.sleep();
