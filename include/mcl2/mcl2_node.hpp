@@ -47,6 +47,8 @@ private:
   rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr
     maximum_likelihood_particles_publisher_;
 
+  rclcpp::Clock ros_clock_;
+
   void receiveInitialPose(
     geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);  //初期位置の受取
   void receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg);  // 尤度場作成用のマップの受取
@@ -55,7 +57,13 @@ private:
   void initPubSub();  // パブリッシャ・サブスクライバ初期化用
   void initTf();      //tf関連の初期化
   void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);  //Mclの初期化
-  void loopMcl();                                                               //Mclのループ
+  void mcl_to_ros2();
+  void setParticles(nav2_msgs::msg::ParticleCloud & particles);
+  inline void publishParticles(nav2_msgs::msg::ParticleCloud particles)
+  {
+    particle_cloud_pub_->publish(particles);
+  };
+  void loopMcl();  //Mclのループ
 
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;

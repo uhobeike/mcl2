@@ -27,7 +27,8 @@ using namespace std::chrono_literals;
 namespace mcl2
 {
 
-Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options) : Node("mcl2_node", options)
+Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options)
+: Node("mcl2_node", options), ros_clock_(RCL_ROS_TIME)
 {
   RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
   initPubSub();
@@ -117,6 +118,32 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
   likelihood_map_pub_->publish(map_);
 }
 
+void Mcl2Node::mcl_to_ros2()
+{
+  nav2_msgs::msg::ParticleCloud particles;
+  setParticles(particles);
+  publishParticles(particles);
+}
+
+void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
+{
+  std_msgs::msg::Header header;
+  header.frame_id = "map";
+  header.stamp.nanosec = ros_clock_.now().nanoseconds();
+  particles.set__header(header);
+
+  particles.particles.resize(mcl_->particles_.size());
+  for (auto i = 0; i < mcl_->particles_.size(); ++i) {
+    particles.particles[i].pose.position.x = mcl_->particles_[i].pose.position.x;
+    particles.particles[i].pose.position.y = mcl_->particles_[i].pose.position.y;
+    tf2::Quaternion q;
+    q.setRPY(0, 0, mcl_->particles_[i].pose.euler.yaw);
+    particles.particles[i].pose.orientation = tf2::toMsg(q);
+
+    particles.particles[i].weight = mcl_->particles_[i].weight;
+  }
+}
+
 void Mcl2Node::loopMcl()
 {
   rclcpp::WallRate loop_rate(100ms);
@@ -125,6 +152,7 @@ void Mcl2Node::loopMcl()
     mcl_->motion_model_->update(mcl_->particles_, 0, 0.001, 0.001, 0);
     mcl_->observation_model_;
     mcl_->resampling_;
+    mcl_to_ros2();
     loop_rate.sleep();
   }
 }
