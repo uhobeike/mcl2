@@ -70,7 +70,9 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
     // old_pose_ = current_pose_;
 
   } else {
-    initMcl(msg);
+    mcl_->initParticles(
+      msg->pose.pose.position.x, msg->pose.pose.position.y, tf2::getYaw(msg->pose.pose.orientation),
+      particle_size_);
   }
 };
 

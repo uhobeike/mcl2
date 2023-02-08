@@ -30,10 +30,12 @@ void Mcl::initParticles(
   p.pose.position.y = ini_pose_y;
   p.pose.euler.yaw = ini_pose_yaw;
 
+  particles_.clear();
   particles_.resize(particle_size);
 
   for (auto i = 0; i < particle_size; i++) {
     particles_[i] = p;
+    particles_[i].weight = 1 / particle_size;
   }
 }
 
