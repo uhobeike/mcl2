@@ -63,6 +63,7 @@ private:
   {
     particle_cloud_pub_->publish(particles);
   };
+  void getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pose);
   void loopMcl();  //Mclのループ
 
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -76,11 +77,15 @@ private:
   nav_msgs::msg::OccupancyGrid map_;
 
   // Mcl2用のパラメータ
+  std::string odom_frame_, robot_frame_;
   double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差
   double particle_size_;                      //パーティクルのサイズ
   double likelihood_dist_;                    //尤度場の距離
 
-  std::shared_ptr<mcl::Mcl> mcl_;  //ROS依存がないMclオブジェクト
+  std::shared_ptr<mcl::Mcl> mcl_;  //ROS依存が無いMclオブジェクト
+
+  geometry_msgs::msg::PoseStamped current_pose_, past_pose_;
+  double delta_x_, delta_y_, delta_yaw_;
 };
 }  // namespace mcl2
 

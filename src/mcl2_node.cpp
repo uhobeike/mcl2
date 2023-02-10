@@ -33,11 +33,11 @@ Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options)
   RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
   initPubSub();
 }
-Mcl2Node::~Mcl2Node() {}
+Mcl2Node::~Mcl2Node() { RCLCPP_INFO(this->get_logger(), "Run Mcl2Node done."); }
 
 void Mcl2Node::initPubSub()
 {
-  RCLCPP_INFO(get_logger(), "Run initPubSub");
+  RCLCPP_INFO(get_logger(), "Run initPubSub.");
 
   particle_cloud_pub_ = create_publisher<nav2_msgs::msg::ParticleCloud>("particle_cloud", 2);
   likelihood_map_pub_ = create_publisher<nav_msgs::msg::OccupancyGrid>("likelihood_map", 2);
@@ -54,6 +54,26 @@ void Mcl2Node::initPubSub()
     "initialpose", 1, std::bind(&Mcl2Node::receiveInitialPose, this, std::placeholders::_1));
   scan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
     "scan", 1, std::bind(&Mcl2Node::receiveScan, this, std::placeholders::_1));
+
+  RCLCPP_INFO(get_logger(), "Run initPubSub done.");
+}
+
+void Mcl2Node::getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pose)
+{
+  while (rclcpp::ok() &&
+         not tf_buffer_->canTransform(odom_frame_, robot_frame_, tf2::TimePoint())) {
+    RCLCPP_WARN(get_logger(), "Wait Can Transform");
+  }
+
+  geometry_msgs::msg::PoseStamped robot_pose;
+  tf2::toMsg(tf2::Transform::getIdentity(), robot_pose.pose);
+
+  std_msgs::msg::Header header;
+  header.set__frame_id(robot_frame_);
+  header.set__stamp(ros_clock_.now());
+  robot_pose.set__header(header);
+
+  tf_buffer_->transform(robot_pose, current_pose, odom_frame_);
 }
 
 void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
@@ -66,14 +86,14 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
     initTf();
     initMcl(msg);
     loopMcl();
-    // getOdom2RobotPose(current_pose_);
-    // old_pose_ = current_pose_;
 
   } else {
     mcl_->initParticles(
       msg->pose.pose.position.x, msg->pose.pose.position.y, tf2::getYaw(msg->pose.pose.orientation),
       particle_size_);
   }
+
+  RCLCPP_INFO(get_logger(), "Run receiveInitialPose done.");
 };
 
 void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg){};
@@ -81,7 +101,7 @@ void Mcl2Node::receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg) { map_ = 
 
 void Mcl2Node::initTf()
 {
-  RCLCPP_INFO(get_logger(), "Run initTf");
+  RCLCPP_INFO(get_logger(), "Run initTf.");
 
   tf_broadcaster_.reset();
   tf_listener_.reset();
@@ -95,11 +115,16 @@ void Mcl2Node::initTf()
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(shared_from_this());
   latest_tf_ = tf2::Transform::getIdentity();
+
+  RCLCPP_INFO(get_logger(), "Run initTf done.");
 }
 
 void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
 {
-  RCLCPP_INFO(get_logger(), "Run initMcl");
+  RCLCPP_INFO(get_logger(), "Run initMcl.");
+
+  odom_frame_ = "odom";
+  robot_frame_ = "base_footprint";
 
   alpha1_ = 0.2;
   alpha2_ = 0.2;
@@ -118,6 +143,11 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
 
   mcl_->likelihood_field_->getLikelihoodField(map_.data);
   likelihood_map_pub_->publish(map_);
+
+  getCurrentRobotPose(current_pose_);
+  past_pose_ = current_pose_;
+
+  RCLCPP_INFO(get_logger(), "Run initMcl done.");
 }
 
 void Mcl2Node::mcl_to_ros2()
@@ -129,6 +159,8 @@ void Mcl2Node::mcl_to_ros2()
 
 void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
 {
+  RCLCPP_INFO(get_logger(), "Run setParticles.");
+
   std_msgs::msg::Header header;
   header.frame_id = "map";
   header.stamp.nanosec = ros_clock_.now().nanoseconds();
@@ -144,19 +176,37 @@ void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
 
     particles.particles[i].weight = mcl_->particles_[i].weight;
   }
+
+  RCLCPP_INFO(get_logger(), "Run setParticles done.");
 }
 
 void Mcl2Node::loopMcl()
 {
   rclcpp::WallRate loop_rate(100ms);
   while (rclcpp::ok() && initialpose_receive_) {
-    RCLCPP_INFO(get_logger(), "Run loop_mcl");
-    mcl_->motion_model_->update(mcl_->particles_, 0, 0.001, 0.001, 0);
+    RCLCPP_INFO(get_logger(), "Run loopMcl.");
+    getCurrentRobotPose(current_pose_);
+
+    mcl_->motion_model_->getDelta(
+      delta_x_, delta_y_, delta_yaw_, current_pose_.pose.position.x, past_pose_.pose.position.x,
+      current_pose_.pose.position.y, past_pose_.pose.position.y,
+      tf2::getYaw(current_pose_.pose.orientation), tf2::getYaw(past_pose_.pose.orientation));
+
+    mcl_->motion_model_->update(
+      mcl_->particles_, tf2::getYaw(current_pose_.pose.orientation), delta_x_, delta_y_,
+      delta_yaw_);
+
     mcl_->observation_model_;
+
     mcl_->resampling_;
+
+    past_pose_ = current_pose_;
+
     mcl_to_ros2();
     loop_rate.sleep();
   }
+
+  RCLCPP_INFO(get_logger(), "Run loopMcl done.");
 }
 }  // namespace mcl2
 
