@@ -1,6 +1,7 @@
 #include "mcl2/mcl/likelihoodField.hpp"
 
 #include <cmath>
+
 namespace mcl
 {
 LikelihoodField::LikelihoodField(
