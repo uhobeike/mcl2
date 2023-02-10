@@ -21,6 +21,9 @@ public:
     double delta_yaw);
   double sumpleNoise(double sigma);
   double diffMinAngle(double angle1, double angle2);
+  void getDelta(
+    double & delta_x, double & delta_y, double & delta_yaw, double current_x, double past_x,
+    double current_y, double past_y, double current_yaw, double past_yaw);
   inline double normalizeAngle(double yaw) { return atan2(sin(yaw), cos(yaw)); }
   inline void normalizeAngle(double & yaw, bool no_return) { yaw = atan2(sin(yaw), cos(yaw)); }
 

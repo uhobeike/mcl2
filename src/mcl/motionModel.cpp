@@ -82,4 +82,14 @@ double MotionModel::diffMinAngle(double angle1, double angle2)
 
   return (fabs(diff_angle_1) < fabs(diff_angle_2)) ? diff_angle_1 : diff_angle_2;
 }
+
+void MotionModel::getDelta(
+  double & delta_x, double & delta_y, double & delta_yaw, double current_x, double past_x,
+  double current_y, double past_y, double current_yaw, double past_yaw)
+{
+  delta_x = current_x - past_x;
+  delta_y = current_y - past_y;
+  delta_yaw = diffMinAngle(current_yaw, past_yaw);
+}
+
 }  // namespace mcl
