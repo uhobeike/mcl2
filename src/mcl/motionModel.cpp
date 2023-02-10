@@ -20,7 +20,7 @@ void MotionModel::update(
   std::vector<Particle> & particles, double current_pose_yaw, double delta_x, double delta_y,
   double delta_yaw)
 {
-  std::cout << "Run update particle pose."
+  std::cout << "Run MotionModel::update."
             << "\n";
   double delta_rotate_1, delta_rotate_2, delta_trans;
   double delta_rotate_1_hat, delta_rotate_2_hat, delta_trans_hat;
@@ -60,7 +60,7 @@ void MotionModel::update(
   std::cout << particles.size() << "\n";
   std::cout << particles[0].pose.position.x << "\n";
   std::cout << particles[0].pose.position.y << "\n";
-  std::cout << "Run update particle pose done."
+  std::cout << "Run MotionModel::update done."
             << "\n";
 }
 
