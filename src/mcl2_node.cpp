@@ -28,7 +28,7 @@ namespace mcl2
 {
 
 Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options)
-: Node("mcl2_node", options), ros_clock_(RCL_ROS_TIME)
+: Node("mcl2_node", options), ros_clock_(RCL_SYSTEM_TIME)
 {
   RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
   initPubSub();
@@ -70,7 +70,7 @@ void Mcl2Node::getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pos
 
   std_msgs::msg::Header header;
   header.set__frame_id(robot_frame_);
-  header.set__stamp(ros_clock_.now());
+  header.set__stamp(rclcpp::Time());
   robot_pose.set__header(header);
 
   tf_buffer_->transform(robot_pose, current_pose, odom_frame_);
