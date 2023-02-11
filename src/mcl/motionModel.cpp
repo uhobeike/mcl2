@@ -12,7 +12,11 @@ MotionModel::MotionModel(
   alpha_trans_rotate_(alpha_trans_rotate),
   alpha_rotate_trans_(alpha_rotate_trans),
   alpha_rotate_rotate_(alpha_rotate_rotate),
-  engine_(seed_gen_()){};
+  engine_(seed_gen_())
+{
+  std::cout << "Run MotionModel::MotionModel done."
+            << "\n";
+};
 MotionModel::~MotionModel(){};
 
 // Probabilistic Robotics p.124
@@ -57,9 +61,6 @@ void MotionModel::update(
     p.pose.position.y += delta_trans_hat * sin(p.pose.euler.yaw + delta_rotate_1_hat);
     p.pose.euler.yaw = normalizeAngle(p.pose.euler.yaw) + delta_rotate_1_hat + delta_rotate_2_hat;
   }
-  std::cout << particles.size() << "\n";
-  std::cout << particles[0].pose.position.x << "\n";
-  std::cout << particles[0].pose.position.y << "\n";
   std::cout << "Run MotionModel::update done."
             << "\n";
 }

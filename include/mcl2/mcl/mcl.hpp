@@ -16,7 +16,9 @@ public:
     double ini_pose_x, double ini_pose_y, double ini_pose_yaw, double alpha_trans_trans,
     double alpha_trans_rotate, double alpha_rotate_trans, double alpha_rotate_rotate,
     int particle_size, double likelihood_dist, uint32_t map_width, uint32_t map_height,
-    double map_resolution, std::vector<int8_t> map_data);
+    double map_resolution, double map_origin_x, double map_origin_y, std::vector<int8_t> map_data,
+    float scan_angle_min, float scan_angle_max, float scan_angle_increment, float scan_range_min,
+    float scan_range_max);
   ~Mcl();
 
   void release_pointers();

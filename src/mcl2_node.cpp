@@ -28,7 +28,7 @@ namespace mcl2
 {
 
 Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options)
-: Node("mcl2_node", options), ros_clock_(RCL_SYSTEM_TIME)
+: Node("mcl2_node", options), ros_clock_(RCL_SYSTEM_TIME), scan_receive_(false), map_receive_(false)
 {
   RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
   initPubSub();
@@ -58,22 +58,16 @@ void Mcl2Node::initPubSub()
   RCLCPP_INFO(get_logger(), "Run initPubSub done.");
 }
 
-void Mcl2Node::getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pose)
+void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
-  while (rclcpp::ok() &&
-         not tf_buffer_->canTransform(odom_frame_, robot_frame_, tf2::TimePoint())) {
-    RCLCPP_WARN(get_logger(), "Wait Can Transform");
-  }
-
-  geometry_msgs::msg::PoseStamped robot_pose;
-  tf2::toMsg(tf2::Transform::getIdentity(), robot_pose.pose);
-
-  std_msgs::msg::Header header;
-  header.set__frame_id(robot_frame_);
-  header.set__stamp(rclcpp::Time());
-  robot_pose.set__header(header);
-
-  tf_buffer_->transform(robot_pose, current_pose, odom_frame_);
+  scan_ = *msg;
+  scan_receive_ = true;
+}
+void Mcl2Node::receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg)
+{
+  map_ = *msg;
+  map_receive_ = true;
+  RCLCPP_INFO(get_logger(), "Received map.");
 }
 
 void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg)
@@ -81,12 +75,18 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
   RCLCPP_INFO(get_logger(), "Run receiveInitialPose");
 
   if (not initialpose_receive_) {
-    initialpose_receive_ = true;
+    if (scan_receive_ && map_receive_) {
+      initialpose_receive_ = true;
 
-    initTf();
-    initMcl(msg);
-    loopMcl();
-
+      initTf();
+      initMcl(msg);
+      loopMcl();
+    } else {
+      if (not scan_receive_)
+        RCLCPP_WARN(get_logger(), "Not yet received scan. Therefore, MCL cannot be initiated.");
+      if (not map_receive_)
+        RCLCPP_WARN(get_logger(), "Not yet received map. Therefore, MCL cannot be initiated.");
+    }
   } else {
     mcl_->initParticles(
       msg->pose.pose.position.x, msg->pose.pose.position.y, tf2::getYaw(msg->pose.pose.orientation),
@@ -95,9 +95,6 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
 
   RCLCPP_INFO(get_logger(), "Run receiveInitialPose done.");
 };
-
-void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg){};
-void Mcl2Node::receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg) { map_ = *msg; }
 
 void Mcl2Node::initTf()
 {
@@ -119,42 +116,22 @@ void Mcl2Node::initTf()
   RCLCPP_INFO(get_logger(), "Run initTf done.");
 }
 
-void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
+void Mcl2Node::getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pose)
 {
-  RCLCPP_INFO(get_logger(), "Run initMcl.");
+  while (rclcpp::ok() &&
+         not tf_buffer_->canTransform(odom_frame_, robot_frame_, tf2::TimePoint())) {
+    RCLCPP_WARN(get_logger(), "Wait Can Transform");
+  }
 
-  odom_frame_ = "odom";
-  robot_frame_ = "base_footprint";
+  geometry_msgs::msg::PoseStamped robot_pose;
+  tf2::toMsg(tf2::Transform::getIdentity(), robot_pose.pose);
 
-  alpha1_ = 0.2;
-  alpha2_ = 0.2;
-  alpha3_ = 0.2;
-  alpha4_ = 0.03;
+  std_msgs::msg::Header header;
+  header.set__frame_id(robot_frame_);
+  header.set__stamp(rclcpp::Time());
+  robot_pose.set__header(header);
 
-  particle_size_ = 500;
-
-  likelihood_dist_ = 20.0;
-
-  mcl_.reset();
-  mcl_ = std::make_shared<mcl::Mcl>(
-    pose->pose.pose.position.x, pose->pose.pose.position.y, 0.0, alpha1_, alpha2_, alpha3_, alpha4_,
-    particle_size_, likelihood_dist_, map_.info.width, map_.info.height, map_.info.resolution,
-    map_.data);
-
-  mcl_->likelihood_field_->getLikelihoodField(map_.data);
-  likelihood_map_pub_->publish(map_);
-
-  getCurrentRobotPose(current_pose_);
-  past_pose_ = current_pose_;
-
-  RCLCPP_INFO(get_logger(), "Run initMcl done.");
-}
-
-void Mcl2Node::mcl_to_ros2()
-{
-  nav2_msgs::msg::ParticleCloud particles;
-  setParticles(particles);
-  publishParticles(particles);
+  tf_buffer_->transform(robot_pose, current_pose, odom_frame_);
 }
 
 void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
@@ -180,6 +157,45 @@ void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
   RCLCPP_INFO(get_logger(), "Run setParticles done.");
 }
 
+void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
+{
+  RCLCPP_INFO(get_logger(), "Run initMcl.");
+
+  odom_frame_ = "odom";
+  robot_frame_ = "base_footprint";
+
+  alpha1_ = 0.2;
+  alpha2_ = 0.2;
+  alpha3_ = 0.2;
+  alpha4_ = 0.03;
+
+  particle_size_ = 500;
+
+  likelihood_dist_ = 20.0;
+
+  mcl_.reset();
+  mcl_ = std::make_shared<mcl::Mcl>(
+    pose->pose.pose.position.x, pose->pose.pose.position.y, 0.0, alpha1_, alpha2_, alpha3_, alpha4_,
+    particle_size_, likelihood_dist_, map_.info.width, map_.info.height, map_.info.resolution,
+    map_.info.origin.position.x, map_.info.origin.position.y, map_.data, scan_.angle_min,
+    scan_.angle_max, scan_.angle_increment, scan_.range_min, scan_.range_max);
+
+  mcl_->observation_model_->likelihood_field_->getLikelihoodField(map_.data);
+  likelihood_map_pub_->publish(map_);
+
+  getCurrentRobotPose(current_pose_);
+  past_pose_ = current_pose_;
+
+  RCLCPP_INFO(get_logger(), "Run initMcl done.");
+}
+
+void Mcl2Node::mcl_to_ros2()
+{
+  nav2_msgs::msg::ParticleCloud particles;
+  setParticles(particles);
+  publishParticles(particles);
+}
+
 void Mcl2Node::loopMcl()
 {
   mcl_loop_timer_ = create_wall_timer(50ms, [this]() {
@@ -196,7 +212,7 @@ void Mcl2Node::loopMcl()
         mcl_->particles_, tf2::getYaw(current_pose_.pose.orientation), delta_x_, delta_y_,
         delta_yaw_);
 
-      mcl_->observation_model_;
+      mcl_->observation_model_->update(mcl_->particles_, scan_.ranges);
 
       mcl_->resampling_;
 

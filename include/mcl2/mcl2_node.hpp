@@ -75,6 +75,8 @@ private:
 
   nav2_msgs::msg::ParticleCloud pc_;  //パーティクル群
   bool initialpose_receive_;          //初期位置を受け取ったかのフラグ
+  bool scan_receive_;                 //スキャンを受け取ったかのフラグ
+  bool map_receive_;                  //マップを受け取ったかのフラグ
 
   nav_msgs::msg::OccupancyGrid map_;
 
@@ -88,6 +90,8 @@ private:
 
   geometry_msgs::msg::PoseStamped current_pose_, past_pose_;
   double delta_x_, delta_y_, delta_yaw_;
+
+  sensor_msgs::msg::LaserScan scan_;
 };
 }  // namespace mcl2
 

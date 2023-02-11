@@ -5,12 +5,14 @@
 namespace mcl
 {
 LikelihoodField::LikelihoodField(
-  double likelihood_dist, uint32_t width, uint32_t height, double resolution,
-  std::vector<int8_t> data)
+  double likelihood_dist, uint32_t width, uint32_t height, double resolution, double origin_x,
+  double origin_y, std::vector<int8_t> data)
 : likelihood_dist_(likelihood_dist),
   width_(width),
   height_(height),
   resolution_(resolution),
+  origin_x_(origin_x),
+  origin_y_(origin_y),
   data_(data),
   create_likelihood_field_(false)
 {
