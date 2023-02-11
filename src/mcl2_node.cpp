@@ -182,31 +182,29 @@ void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
 
 void Mcl2Node::loopMcl()
 {
-  rclcpp::WallRate loop_rate(100ms);
-  while (rclcpp::ok() && initialpose_receive_) {
-    RCLCPP_INFO(get_logger(), "Run loopMcl.");
-    getCurrentRobotPose(current_pose_);
+  mcl_loop_timer_ = create_wall_timer(50ms, [this]() {
+    if (rclcpp::ok() && initialpose_receive_) {
+      RCLCPP_INFO(get_logger(), "Run loopMcl.");
+      getCurrentRobotPose(current_pose_);
 
-    mcl_->motion_model_->getDelta(
-      delta_x_, delta_y_, delta_yaw_, current_pose_.pose.position.x, past_pose_.pose.position.x,
-      current_pose_.pose.position.y, past_pose_.pose.position.y,
-      tf2::getYaw(current_pose_.pose.orientation), tf2::getYaw(past_pose_.pose.orientation));
+      mcl_->motion_model_->getDelta(
+        delta_x_, delta_y_, delta_yaw_, current_pose_.pose.position.x, past_pose_.pose.position.x,
+        current_pose_.pose.position.y, past_pose_.pose.position.y,
+        tf2::getYaw(current_pose_.pose.orientation), tf2::getYaw(past_pose_.pose.orientation));
 
-    mcl_->motion_model_->update(
-      mcl_->particles_, tf2::getYaw(current_pose_.pose.orientation), delta_x_, delta_y_,
-      delta_yaw_);
+      mcl_->motion_model_->update(
+        mcl_->particles_, tf2::getYaw(current_pose_.pose.orientation), delta_x_, delta_y_,
+        delta_yaw_);
 
-    mcl_->observation_model_;
+      mcl_->observation_model_;
 
-    mcl_->resampling_;
+      mcl_->resampling_;
 
-    past_pose_ = current_pose_;
+      past_pose_ = current_pose_;
 
-    mcl_to_ros2();
-    loop_rate.sleep();
-  }
-
-  RCLCPP_INFO(get_logger(), "Run loopMcl done.");
+      mcl_to_ros2();
+    }
+  });
 }
 }  // namespace mcl2
 

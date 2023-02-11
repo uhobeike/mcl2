@@ -47,6 +47,8 @@ private:
   rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr
     maximum_likelihood_particles_publisher_;
 
+  rclcpp::TimerBase::SharedPtr mcl_loop_timer_;
+
   rclcpp::Clock ros_clock_;
 
   void receiveInitialPose(
