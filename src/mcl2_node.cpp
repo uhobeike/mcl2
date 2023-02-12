@@ -205,13 +205,13 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
   robot_frame_ = "base_footprint";
 
   alpha1_ = 2.0;
-  alpha2_ = 1.0;
-  alpha3_ = 0.1;
+  alpha2_ = 0.2;
+  alpha3_ = 0.03;
   alpha4_ = 0.05;
 
   particle_size_ = 500;
 
-  likelihood_dist_ = 10.0;
+  likelihood_dist_ = 5.0;
 
   loop_mcl_hz_ = 500ms;
 
