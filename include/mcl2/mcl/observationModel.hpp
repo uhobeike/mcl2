@@ -19,14 +19,15 @@ public:
   ~ObservationModel();
 
   void initScan(
-    float angle_min, float angle_max, float angle_increment, float range_min, float range_max);
-  void setScan(std::vector<float> & scan_data);
+    float angle_min, float angle_max, float angle_increment, float range_min,
+    float range_max);  // スキャンに関するパラメータをセットする
+  void setScan(std::vector<float> & scan_data);  // ROS 2のスキャンをMClのスキャンとしてセットする
 
-  void update(std::vector<Particle> & particles, std::vector<float> scan_data);
-  double calculateParticleWeight(const Particle p);
-  double getProbFromLikelihoodMap(double x, double y);
+  void update(std::vector<Particle> & particles, std::vector<float> scan_data);  // 観測モデルの更新
+  double calculateParticleWeight(const Particle p);  // パーティクルの重みを計算する
+  double getProbFromLikelihoodMap(double x, double y);  // 尤度場から確率を取得する
 
-  inline double getRadian(double degree) { return degree * M_PI / 180; }
+  inline double getRadian(double degree) { return degree * M_PI / 180; }  // ラジアンに変換する
 
   std::shared_ptr<mcl::LikelihoodField> likelihood_field_;
   Scan scan_;
