@@ -23,13 +23,15 @@ public:
 
   void release_pointers();
 
-  std::shared_ptr<LikelihoodField> likelihood_field_;
-  std::shared_ptr<MotionModel> motion_model_;
-  std::shared_ptr<ObservationModel> observation_model_;
-  std::shared_ptr<Resampling> resampling_;
+  std::shared_ptr<LikelihoodField> likelihood_field_;    // 尤度場オブジェクト
+  std::shared_ptr<MotionModel> motion_model_;            // 動作モデルオブジェクト
+  std::shared_ptr<ObservationModel> observation_model_;  // 観測モデルオブジェクト
+  std::shared_ptr<Resampling> resampling_;               // リサンプリングオブジェクト
 
-  void initParticles(double ini_pose_x, double ini_pose_y, double ini_pose_yaw, int particle_size);
-  Particle getMaximumLikelihoodParticles();
+  void initParticles(
+    double ini_pose_x, double ini_pose_y, double ini_pose_yaw,
+    int particle_size);                      // パーティクルの初期化をする
+  Particle getMaximumLikelihoodParticles();  // 最尤なパーティクルを渡す
 
   std::vector<Particle> particles_;
 };
