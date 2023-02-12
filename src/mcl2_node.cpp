@@ -214,7 +214,7 @@ void Mcl2Node::loopMcl()
 
       mcl_->observation_model_->update(mcl_->particles_, scan_.ranges);
 
-      mcl_->resampling_;
+      mcl_->resampling_->resampling(mcl_->particles_);
 
       past_pose_ = current_pose_;
 

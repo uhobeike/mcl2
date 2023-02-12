@@ -39,7 +39,7 @@ void Mcl::initParticles(
 
   for (auto i = 0; i < particle_size; i++) {
     particles_[i] = p;
-    particles_[i].weight = 1 / particle_size;
+    particles_[i].weight = 1. / particle_size;
   }
 }
 
