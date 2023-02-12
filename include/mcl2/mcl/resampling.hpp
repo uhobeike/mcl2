@@ -14,11 +14,12 @@ public:
   Resampling(int particle_size_);
   ~Resampling();
 
-  void resampling(std::vector<Particle> & particles);
+  void resampling(std::vector<Particle> & particles);  // リサンプリングをする
 
-  void systematicSampling(std::vector<Particle> & particles);
-  double calculateSystematicSamplingStep(double particles_weight_median);
-  void normalize(std::vector<Particle> & particles);
+  void systematicSampling(std::vector<Particle> & particles);  // 系統サンプリングをする
+  double calculateSystematicSamplingStep(
+    double particles_weight_median);  // 系統サンプリング用のstepを計算する
+  void normalize(std::vector<Particle> & particles);  // パーティクルの重みを正規化をする
 
   std::random_device seed_gen_;
   std::mt19937 engine_;
