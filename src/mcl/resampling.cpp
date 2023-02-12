@@ -14,7 +14,7 @@ void Resampling::resampling(std::vector<Particle> & particles)
             << "\n";
   systematicSampling(particles);
   normalize(particles);
-  std::cout << "Run Resampling::resampling done."
+  std::cout << "Done Resampling::resampling."
             << "\n";
 }
 

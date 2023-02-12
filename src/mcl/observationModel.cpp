@@ -10,7 +10,7 @@ ObservationModel::ObservationModel(
   std::cout << "Run ObservationModel::ObservationModel."
             << "\n";
   initScan(angle_min, angle_max, angle_increment, range_min, range_max);
-  std::cout << "Run ObservationModel::ObservationModel done."
+  std::cout << "Done ObservationModel::ObservationModel."
             << "\n";
 };
 ObservationModel::~ObservationModel(){};
@@ -25,7 +25,7 @@ void ObservationModel::initScan(
   scan_.angle_increment = angle_increment;
   scan_.range_min = range_min;
   scan_.range_max = range_max;
-  std::cout << "Run ObservationModel::initScan done."
+  std::cout << "Done ObservationModel::initScan."
             << "\n";
 }
 
@@ -35,7 +35,7 @@ void ObservationModel::setScan(std::vector<float> & scan_data)
             << "\n";
   scan_.ranges.resize(scan_data.size());
   std::copy(std::begin(scan_data), std::end(scan_data), std::begin(scan_.ranges));
-  std::cout << "Run ObservationModel::setScan done."
+  std::cout << "Done ObservationModel::setScan."
             << "\n";
 }
 
@@ -54,7 +54,7 @@ void ObservationModel::update(std::vector<Particle> & particles, std::vector<flo
   }
 
   std::cout << sum_score / (particles.size() * scan_.ranges.size()) << "\n";
-  std::cout << "Run ObservationModel::update done."
+  std::cout << "Done ObservationModel::update."
             << "\n";
 }
 

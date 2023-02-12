@@ -20,7 +20,7 @@ LikelihoodField::LikelihoodField(
             << "\n";
   createLikelihoodField();
   create_likelihood_field_ = true;
-  std::cout << "Create LikelihoodField done."
+  std::cout << "Done Create LikelihoodField."
             << "\n";
 };
 LikelihoodField::~LikelihoodField(){};

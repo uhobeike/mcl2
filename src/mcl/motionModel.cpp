@@ -14,7 +14,7 @@ MotionModel::MotionModel(
   alpha_rotate_rotate_(alpha_rotate_rotate),
   engine_(seed_gen_())
 {
-  std::cout << "Run MotionModel::MotionModel done."
+  std::cout << "Done MotionModel::MotionModel."
             << "\n";
 };
 MotionModel::~MotionModel(){};
@@ -61,7 +61,7 @@ void MotionModel::update(
     p.pose.position.y += delta_trans_hat * sin(p.pose.euler.yaw + delta_rotate_1_hat);
     p.pose.euler.yaw = normalizeAngle(p.pose.euler.yaw) + delta_rotate_1_hat + delta_rotate_2_hat;
   }
-  std::cout << "Run MotionModel::update done."
+  std::cout << "Done MotionModel::update."
             << "\n";
 }
 
