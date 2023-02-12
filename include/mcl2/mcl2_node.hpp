@@ -47,55 +47,56 @@ private:
   rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr
     maximum_likelihood_particles_publisher_;
 
-  rclcpp::TimerBase::SharedPtr mcl_loop_timer_;
+  rclcpp::TimerBase::SharedPtr mcl_loop_timer_;  // MClのループ用のタイマー
 
-  rclcpp::Clock ros_clock_;
+  rclcpp::Clock ros_clock_;  // 時間を取得する用
 
   void receiveInitialPose(
-    geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);  //初期位置の受取
+    geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);  // 初期位置の受取
   void receiveMap(nav_msgs::msg::OccupancyGrid::SharedPtr msg);  // 尤度場作成用のマップの受取
   void receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg);  // LiDARからのデータの受取
 
-  void initPubSub();  // パブリッシャ・サブスクライバ初期化用
-  void setParam();
-  void getParam();
-  void initTf();  //tf関連の初期化
-  void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);  //Mclの初期化
-  void mcl_to_ros2();
-  void setParticles(nav2_msgs::msg::ParticleCloud & particles);
-  inline void publishParticles(nav2_msgs::msg::ParticleCloud particles)
+  void initPubSub();  // パブリッシャ・サブスクライバ初期化
+  void setParam();    // デフォルトパラメータの設定
+  void getParam();    // パラメータを取得する
+  void initTf();      // tf関連の初期化
+  void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);  // MClの初期化
+  void mcl_to_ros2();  // MClからROS 2の橋渡し的なことをする
+  void setParticles(nav2_msgs::msg::ParticleCloud &
+                      particles);  // MCLのパーティクルからROS 2のパーティクルに置き換える
+  inline void publishParticles(
+    nav2_msgs::msg::ParticleCloud particles)  // ROS 2のパーティクルをパブリッシュする
   {
     particle_cloud_pub_->publish(particles);
   };
-  void transformMapToOdom();
-  void getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pose);
-  void loopMcl();  //Mclのループ
+  void transformMapToOdom();  // 推定した姿勢からマップ座標系オドメトリー座標系間の変換を行う
+  void getCurrentRobotPose(geometry_msgs::msg::PoseStamped &
+                             current_pose);  // オドメトリー座標系でのロボット姿勢を取得する
+  void loopMcl();                            // MClのループ
 
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
   tf2::Transform latest_tf_;
 
-  nav2_msgs::msg::ParticleCloud pc_;  //パーティクル群
-  bool initialpose_receive_;          //初期位置を受け取ったかのフラグ
-  bool scan_receive_;                 //スキャンを受け取ったかのフラグ
-  bool map_receive_;                  //マップを受け取ったかのフラグ
+  nav_msgs::msg::OccupancyGrid map_;  // 受けったマップ
+  sensor_msgs::msg::LaserScan scan_;  // 受け取ったスキャン
 
-  nav_msgs::msg::OccupancyGrid map_;
+  bool initialpose_receive_;  // 初期位置を受け取ったかのフラグ
+  bool scan_receive_;         // スキャンを受け取ったかのフラグ
+  bool map_receive_;          // マップを受け取ったかのフラグ
+
+  std::shared_ptr<mcl::Mcl> mcl_;  // ROS依存が無いMClオブジェクト
+
+  geometry_msgs::msg::PoseStamped current_pose_, past_pose_;  // 現在の姿勢、現在より一個前の姿勢
+  double delta_x_, delta_y_, delta_yaw_;  // 現在の姿勢と現在の姿勢を比較したときの各差分
 
   // Mcl2用のパラメータ
-  std::string map_frame_, odom_frame_, robot_frame_;
-  double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差
-  int particle_size_;                         //パーティクルのサイズ
-  double likelihood_dist_;                    //尤度場の距離
-  std::chrono::milliseconds loop_mcl_ms_;
-
-  std::shared_ptr<mcl::Mcl> mcl_;  //ROS依存が無いMclオブジェクト
-
-  geometry_msgs::msg::PoseStamped current_pose_, past_pose_;
-  double delta_x_, delta_y_, delta_yaw_;
-
-  sensor_msgs::msg::LaserScan scan_;
+  std::string map_frame_, odom_frame_, robot_frame_;  // 各座標系
+  double alpha1_, alpha2_, alpha3_, alpha4_;          // 動作モデル用の誤差
+  int particle_size_;                                 // パーティクルのサイズ
+  double likelihood_dist_;                            // 尤度場の距離
+  std::chrono::milliseconds loop_mcl_ms_;             // MClの実行周期
 };
 }  // namespace mcl2
 
