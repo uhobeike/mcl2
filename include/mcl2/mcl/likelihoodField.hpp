@@ -14,20 +14,21 @@ public:
     double origin_y, std::vector<int8_t> data);
   ~LikelihoodField();
 
-  void createLikelihoodField();
-  void calculateLikelihood(uint32_t map_x, uint32_t map_y);
-  double calculatePdf(double stochastic_variable, double likelihood_dist);
-  double normalizePdf(double max_pdf, double pdf);
+  void createLikelihoodField();                              // 尤度場を作成する
+  void calculateLikelihood(uint32_t map_x, uint32_t map_y);  // 尤度場作成のための計算をする
+  double calculateProb(
+    double stochastic_variable, double likelihood_dist);  // 尤度場作成に必要な確率を求める
+  double normalizePdf(double max_pdf, double pdf);  // 足して1になるように確率を修正する
 
-  bool getLikelihoodField(std::vector<int8_t> & data);
+  bool getLikelihoodField(std::vector<int8_t> & data);  // 尤度場を渡す
 
-  double likelihood_dist_;
-  uint32_t width_;
-  uint32_t height_;
-  double resolution_;
-  double origin_x_;
-  double origin_y_;
-  std::vector<int8_t> data_;
+  double likelihood_dist_;    // 尤度場の距離
+  uint32_t width_;            // 受け取ったマップのwidth
+  uint32_t height_;           // 受け取ったマップのheight
+  double resolution_;         // 受け取ったマップの解像度
+  double origin_x_;           // 受け取ったマップの原点x
+  double origin_y_;           // 受け取ったマップの原点y
+  std::vector<int8_t> data_;  // 受け取ったマップの各画素の情報
 
   bool create_likelihood_field_;
 };
