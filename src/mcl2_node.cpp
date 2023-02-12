@@ -33,6 +33,8 @@ Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options)
 {
   RCLCPP_INFO(this->get_logger(), "Run Mcl2Node");
   initPubSub();
+  setParam();
+  getParam();
 }
 Mcl2Node::~Mcl2Node() { RCLCPP_INFO(this->get_logger(), "Run Mcl2Node done."); }
 
@@ -96,6 +98,42 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
 
   RCLCPP_INFO(get_logger(), "Run receiveInitialPose done.");
 };
+
+void Mcl2Node::setParam()
+{
+  declare_parameter("map_frame", "map");
+  declare_parameter("odom_frame", "odom");
+  declare_parameter("robot_frame", "base_footprint");
+
+  declare_parameter("particle_size", 500);
+
+  declare_parameter("alpha_trans_trans", 2.0);
+  declare_parameter("alpha_trans_rotate", 0.2);
+  declare_parameter("alpha_rotate_trans", 0.03);
+  declare_parameter("alpha_rotate_rotate", 0.05);
+
+  declare_parameter("likelihood_dist", 5.0);
+
+  declare_parameter("loop_mcl_hz", 2.0);
+}
+void Mcl2Node::getParam()
+{
+  map_frame_ = get_parameter("map_frame").get_value<std::string>();
+  odom_frame_ = get_parameter("odom_frame").get_value<std::string>();
+  robot_frame_ = get_parameter("robot_frame").get_value<std::string>();
+
+  particle_size_ = get_parameter("particle_size").get_value<int>();
+
+  alpha1_ = get_parameter("alpha_trans_trans").get_value<double>();
+  alpha2_ = get_parameter("alpha_trans_rotate").get_value<double>();
+  alpha3_ = get_parameter("alpha_rotate_trans").get_value<double>();
+  alpha4_ = get_parameter("alpha_rotate_rotate").get_value<double>();
+
+  likelihood_dist_ = get_parameter("likelihood_dist").get_value<double>();
+
+  int loop_mcl_hz = 1000 / get_parameter("loop_mcl_hz").get_value<double>();
+  loop_mcl_ms_ = std::chrono::milliseconds{loop_mcl_hz};
+}
 
 void Mcl2Node::initTf()
 {
@@ -200,21 +238,6 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
 {
   RCLCPP_INFO(get_logger(), "Run initMcl.");
 
-  map_frame_ = "map";
-  odom_frame_ = "odom";
-  robot_frame_ = "base_footprint";
-
-  alpha1_ = 2.0;
-  alpha2_ = 0.2;
-  alpha3_ = 0.03;
-  alpha4_ = 0.05;
-
-  particle_size_ = 500;
-
-  likelihood_dist_ = 5.0;
-
-  loop_mcl_hz_ = 500ms;
-
   mcl_.reset();
   mcl_ = std::make_shared<mcl::Mcl>(
     pose->pose.pose.position.x, pose->pose.pose.position.y,
@@ -242,7 +265,7 @@ void Mcl2Node::mcl_to_ros2()
 
 void Mcl2Node::loopMcl()
 {
-  mcl_loop_timer_ = create_wall_timer(loop_mcl_hz_, [this]() {
+  mcl_loop_timer_ = create_wall_timer(loop_mcl_ms_, [this]() {
     if (rclcpp::ok() && initialpose_receive_) {
       RCLCPP_INFO(get_logger(), "Run loopMcl.");
       getCurrentRobotPose(current_pose_);

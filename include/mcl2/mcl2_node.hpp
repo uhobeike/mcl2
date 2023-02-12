@@ -57,7 +57,9 @@ private:
   void receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg);  // LiDARからのデータの受取
 
   void initPubSub();  // パブリッシャ・サブスクライバ初期化用
-  void initTf();      //tf関連の初期化
+  void setParam();
+  void getParam();
+  void initTf();  //tf関連の初期化
   void initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose);  //Mclの初期化
   void mcl_to_ros2();
   void setParticles(nav2_msgs::msg::ParticleCloud & particles);
@@ -84,9 +86,9 @@ private:
   // Mcl2用のパラメータ
   std::string map_frame_, odom_frame_, robot_frame_;
   double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差
-  double particle_size_;                      //パーティクルのサイズ
+  int particle_size_;                         //パーティクルのサイズ
   double likelihood_dist_;                    //尤度場の距離
-  std::chrono::milliseconds loop_mcl_hz_;
+  std::chrono::milliseconds loop_mcl_ms_;
 
   std::shared_ptr<mcl::Mcl> mcl_;  //ROS依存が無いMclオブジェクト
 
