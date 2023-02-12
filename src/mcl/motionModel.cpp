@@ -45,16 +45,16 @@ void MotionModel::update(
 
   for (auto & p : particles) {
     delta_rotate_1_hat = diffMinAngle(
-      delta_rotate_1, sumpleNoise(sqrt(
+      delta_rotate_1, drawNoise(sqrt(
                         alpha_trans_trans_ * delta_rotate_1_noise * delta_rotate_1_noise +
                         alpha_trans_rotate_ * delta_trans * delta_trans)));
     delta_trans_hat =
-      delta_trans - sumpleNoise(sqrt(
+      delta_trans - drawNoise(sqrt(
                       alpha_rotate_trans_ * delta_trans * delta_trans +
                       alpha_rotate_rotate_ * delta_rotate_1_noise * delta_rotate_1_noise +
                       alpha_rotate_rotate_ * delta_rotate_2_noise * delta_rotate_2_noise));
     delta_rotate_2_hat = diffMinAngle(
-      delta_rotate_2, sumpleNoise(sqrt(
+      delta_rotate_2, drawNoise(sqrt(
                         alpha_trans_trans_ * delta_rotate_2_noise * delta_rotate_2_noise +
                         alpha_trans_rotate_ * delta_trans * delta_trans)));
 
@@ -67,7 +67,7 @@ void MotionModel::update(
             << "\n";
 }
 
-double MotionModel::sumpleNoise(double sigma)
+double MotionModel::drawNoise(double sigma)
 {
   std::normal_distribution<> dist(0, sigma);
 
