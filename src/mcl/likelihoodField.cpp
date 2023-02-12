@@ -49,15 +49,15 @@ void LikelihoodField::calculateLikelihood(uint32_t map_x, uint32_t map_y)
       if (hypot(x - map_x, y - map_y) < likelihood_dist_)
         if (
           normalizePdf(
-            calculatePdf(0, likelihood_dist_),
-            calculatePdf(hypot(x - map_x, y - map_y), likelihood_dist_)) >
+            calculateProb(0, likelihood_dist_),
+            calculateProb(hypot(x - map_x, y - map_y), likelihood_dist_)) >
           data_[width_ * (height_ - y - 1) + x])
           data_[width_ * (height_ - y - 1) + x] = normalizePdf(
-            calculatePdf(0, likelihood_dist_),
-            calculatePdf(hypot(x - map_x, y - map_y), likelihood_dist_));
+            calculateProb(0, likelihood_dist_),
+            calculateProb(hypot(x - map_x, y - map_y), likelihood_dist_));
 };
 
-double LikelihoodField::calculatePdf(double stochastic_variable, double likelihood_dist)
+double LikelihoodField::calculateProb(double stochastic_variable, double likelihood_dist)
 {
   double sigma = likelihood_dist / 3;
   double pdf = 1. / std::sqrt(2. * M_PI * sigma * sigma) *
