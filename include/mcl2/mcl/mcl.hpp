@@ -29,6 +29,7 @@ public:
   std::shared_ptr<Resampling> resampling_;
 
   void initParticles(double ini_pose_x, double ini_pose_y, double ini_pose_yaw, int particle_size);
+  Particle getMaximumLikelihoodParticles();
 
   std::vector<Particle> particles_;
 };

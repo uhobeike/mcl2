@@ -65,6 +65,7 @@ private:
   {
     particle_cloud_pub_->publish(particles);
   };
+  void transformMapToOdom();
   void getCurrentRobotPose(geometry_msgs::msg::PoseStamped & current_pose);
   void loopMcl();  //Mclのループ
 
@@ -81,10 +82,11 @@ private:
   nav_msgs::msg::OccupancyGrid map_;
 
   // Mcl2用のパラメータ
-  std::string odom_frame_, robot_frame_;
+  std::string map_frame_, odom_frame_, robot_frame_;
   double alpha1_, alpha2_, alpha3_, alpha4_;  //動作モデル用の誤差
   double particle_size_;                      //パーティクルのサイズ
   double likelihood_dist_;                    //尤度場の距離
+  std::chrono::milliseconds loop_mcl_hz_;
 
   std::shared_ptr<mcl::Mcl> mcl_;  //ROS依存が無いMclオブジェクト
 

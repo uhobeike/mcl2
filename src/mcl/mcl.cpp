@@ -51,6 +51,28 @@ void Mcl::initParticles(
             << "\n";
 }
 
+Particle Mcl::getMaximumLikelihoodParticles()
+{
+  double max_likelihood;
+  bool once_flag = true;
+  for (auto particle : particles_) {
+    if (once_flag) max_likelihood = particle.weight;
+    once_flag = false;
+
+    max_likelihood = std::max(max_likelihood, particle.weight);
+  }
+
+  std::vector<Particle> maximum_likelihood_particles;
+  int cnt = 0;
+  for (auto particle : particles_)
+    if (particle.weight >= max_likelihood) {
+      maximum_likelihood_particles.push_back(particle);
+      cnt++;
+    }
+
+  return maximum_likelihood_particles[0];
+}
+
 void Mcl::release_pointers()
 {
   likelihood_field_.reset();
