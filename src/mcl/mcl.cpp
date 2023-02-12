@@ -12,6 +12,7 @@ Mcl::Mcl(
 {
   std::cout << "Run Mcl::Mcl."
             << "\n";
+
   initParticles(ini_pose_x, ini_pose_y, ini_pose_yaw, particle_size);
 
   release_pointers();
@@ -23,6 +24,7 @@ Mcl::Mcl(
   observation_model_ = std::make_shared<ObservationModel>(
     std::move(likelihood_field_), scan_angle_min, scan_angle_max, scan_angle_increment,
     scan_range_min, scan_range_max);
+
   resampling_ = std::make_shared<Resampling>(particle_size);
   std::cout << "Done Mcl::Mcl."
             << "\n";
@@ -35,6 +37,7 @@ void Mcl::initParticles(
 {
   std::cout << "Run Mcl::initParticles."
             << "\n";
+
   Particle p;
   p.pose.position.x = ini_pose_x;
   p.pose.position.y = ini_pose_y;
@@ -47,6 +50,7 @@ void Mcl::initParticles(
     particles_[i] = p;
     particles_[i].weight = 1. / particle_size;
   }
+
   std::cout << "Done Mcl::initParticles."
             << "\n";
 }

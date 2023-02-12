@@ -18,8 +18,10 @@ LikelihoodField::LikelihoodField(
 {
   std::cout << "Create LikelihoodField."
             << "\n";
+
   createLikelihoodField();
   create_likelihood_field_ = true;
+
   std::cout << "Done Create LikelihoodField."
             << "\n";
 };

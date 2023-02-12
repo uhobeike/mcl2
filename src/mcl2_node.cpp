@@ -58,7 +58,7 @@ void Mcl2Node::initPubSub()
   scan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
     "scan", 1, std::bind(&Mcl2Node::receiveScan, this, std::placeholders::_1));
 
-  RCLCPP_INFO(get_logger(), "Run initPubSub done.");
+  RCLCPP_INFO(get_logger(), "Done initPubSub done.");
 }
 
 void Mcl2Node::receiveScan(sensor_msgs::msg::LaserScan::SharedPtr msg)
@@ -96,11 +96,13 @@ void Mcl2Node::receiveInitialPose(geometry_msgs::msg::PoseWithCovarianceStamped:
       particle_size_);
   }
 
-  RCLCPP_INFO(get_logger(), "Run receiveInitialPose done.");
+  RCLCPP_INFO(get_logger(), "Done receiveInitialPose.");
 };
 
 void Mcl2Node::setParam()
 {
+  RCLCPP_INFO(get_logger(), "Run setParam.");
+
   declare_parameter("map_frame", "map");
   declare_parameter("odom_frame", "odom");
   declare_parameter("robot_frame", "base_footprint");
@@ -115,9 +117,13 @@ void Mcl2Node::setParam()
   declare_parameter("likelihood_dist", 5.0);
 
   declare_parameter("loop_mcl_hz", 2.0);
+
+  RCLCPP_INFO(get_logger(), "Done setParam.");
 }
 void Mcl2Node::getParam()
 {
+  RCLCPP_INFO(get_logger(), "Run getParam.");
+
   map_frame_ = get_parameter("map_frame").get_value<std::string>();
   odom_frame_ = get_parameter("odom_frame").get_value<std::string>();
   robot_frame_ = get_parameter("robot_frame").get_value<std::string>();
@@ -133,6 +139,8 @@ void Mcl2Node::getParam()
 
   int loop_mcl_hz = 1000 / get_parameter("loop_mcl_hz").get_value<double>();
   loop_mcl_ms_ = std::chrono::milliseconds{loop_mcl_hz};
+
+  RCLCPP_INFO(get_logger(), "Done getParam.");
 }
 
 void Mcl2Node::initTf()
@@ -152,11 +160,13 @@ void Mcl2Node::initTf()
   tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(shared_from_this());
   latest_tf_ = tf2::Transform::getIdentity();
 
-  RCLCPP_INFO(get_logger(), "Run initTf done.");
+  RCLCPP_INFO(get_logger(), "Done initTf.");
 }
 
 void Mcl2Node::transformMapToOdom()
 {
+  RCLCPP_INFO(get_logger(), "Run initTf.");
+
   Particle maximum_likelihood_particle;
   maximum_likelihood_particle = mcl_->getMaximumLikelihoodParticles();
 
@@ -231,7 +241,7 @@ void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
     particles.particles[i].weight = mcl_->particles_[i].weight;
   }
 
-  RCLCPP_INFO(get_logger(), "Run setParticles done.");
+  RCLCPP_INFO(get_logger(), "Done setParticles.");
 }
 
 void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
@@ -252,15 +262,19 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
   getCurrentRobotPose(current_pose_);
   past_pose_ = current_pose_;
 
-  RCLCPP_INFO(get_logger(), "Run initMcl done.");
+  RCLCPP_INFO(get_logger(), "Done initMcl.");
 }
 
 void Mcl2Node::mcl_to_ros2()
 {
+  RCLCPP_INFO(get_logger(), "Run mcl_to_ros2.");
+
   nav2_msgs::msg::ParticleCloud particles;
   setParticles(particles);
   publishParticles(particles);
   transformMapToOdom();
+
+  RCLCPP_INFO(get_logger(), "Done mcl_to_ros2.");
 }
 
 void Mcl2Node::loopMcl()

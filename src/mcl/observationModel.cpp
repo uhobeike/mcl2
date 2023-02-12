@@ -9,7 +9,9 @@ ObservationModel::ObservationModel(
 {
   std::cout << "Run ObservationModel::ObservationModel."
             << "\n";
+
   initScan(angle_min, angle_max, angle_increment, range_min, range_max);
+
   std::cout << "Done ObservationModel::ObservationModel."
             << "\n";
 };
@@ -20,11 +22,13 @@ void ObservationModel::initScan(
 {
   std::cout << "Run ObservationModel::initScan."
             << "\n";
+
   scan_.angle_min = angle_min;
   scan_.angle_max = angle_max;
   scan_.angle_increment = angle_increment;
   scan_.range_min = range_min;
   scan_.range_max = range_max;
+
   std::cout << "Done ObservationModel::initScan."
             << "\n";
 }
@@ -33,8 +37,10 @@ void ObservationModel::setScan(std::vector<float> & scan_data)
 {
   std::cout << "Run ObservationModel::setScan."
             << "\n";
+
   scan_.ranges.resize(scan_data.size());
   std::copy(std::begin(scan_data), std::end(scan_data), std::begin(scan_.ranges));
+
   std::cout << "Done ObservationModel::setScan."
             << "\n";
 }
@@ -43,6 +49,7 @@ void ObservationModel::update(std::vector<Particle> & particles, std::vector<flo
 {
   std::cout << "Run ObservationModel::update."
             << "\n";
+
   setScan(scan_data);
 
   double sum_score = 0.;
@@ -61,6 +68,7 @@ double ObservationModel::calculateParticleWeight(const Particle p)
 {
   // std::cout << "Run ObservationModel::calculateParticleWeight."
   //           << "\n";
+
   std::vector<double> hit_xy;
   double particle_weight = 0.;
   double scan_angle_increment = scan_.angle_increment;
