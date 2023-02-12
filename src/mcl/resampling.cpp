@@ -5,7 +5,7 @@
 
 namespace mcl
 {
-Resampling::Resampling() : engine_(seed_gen_()){};
+Resampling::Resampling(int particle_size) : engine_(seed_gen_()), particle_size_(particle_size){};
 Resampling::~Resampling(){};
 
 void Resampling::resampling(std::vector<Particle> & particles)
@@ -31,7 +31,7 @@ void Resampling::systematicSampling(std::vector<Particle> & particles)
 
   uint32_t index = 0;
   std::vector<Particle> new_particles;
-  while (new_particles.size() <= 500) {
+  while (new_particles.size() <= particle_size_) {
     if (systematic_sampling_step < particles_weight_sum[index]) {
       if (particles[index].weight < 0.2) {
         ++index;

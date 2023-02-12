@@ -11,7 +11,7 @@ namespace mcl
 class Resampling
 {
 public:
-  Resampling();
+  Resampling(int particle_size_);
   ~Resampling();
 
   void resampling(std::vector<Particle> & particles);
@@ -22,6 +22,8 @@ public:
 
   std::random_device seed_gen_;
   std::mt19937 engine_;
+
+  int particle_size_;
 };
 }  // namespace mcl
 

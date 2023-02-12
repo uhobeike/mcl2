@@ -23,7 +23,7 @@ Mcl::Mcl(
   observation_model_ = std::make_shared<ObservationModel>(
     std::move(likelihood_field_), scan_angle_min, scan_angle_max, scan_angle_increment,
     scan_range_min, scan_range_max);
-  resampling_ = std::make_shared<Resampling>();
+  resampling_ = std::make_shared<Resampling>(particle_size);
   std::cout << "Done Mcl::Mcl."
             << "\n";
 }
