@@ -175,8 +175,9 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
 
   mcl_.reset();
   mcl_ = std::make_shared<mcl::Mcl>(
-    pose->pose.pose.position.x, pose->pose.pose.position.y, 0.0, alpha1_, alpha2_, alpha3_, alpha4_,
-    particle_size_, likelihood_dist_, map_.info.width, map_.info.height, map_.info.resolution,
+    pose->pose.pose.position.x, pose->pose.pose.position.y,
+    tf2::getYaw(pose->pose.pose.orientation), alpha1_, alpha2_, alpha3_, alpha4_, particle_size_,
+    likelihood_dist_, map_.info.width, map_.info.height, map_.info.resolution,
     map_.info.origin.position.x, map_.info.origin.position.y, map_.data, scan_.angle_min,
     scan_.angle_max, scan_.angle_increment, scan_.range_min, scan_.range_max);
 
