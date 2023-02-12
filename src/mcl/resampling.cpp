@@ -31,8 +31,12 @@ void Resampling::systematicSampling(std::vector<Particle> & particles)
 
   uint32_t index = 0;
   std::vector<Particle> new_particles;
-  while (new_particles.size() <= particles.size()) {
+  while (new_particles.size() <= 500) {
     if (systematic_sampling_step < particles_weight_sum[index]) {
+      if (particles[index].weight < 0.2) {
+        ++index;
+        continue;
+      }
       new_particles.push_back(particles[index]);
       ++systematic_sampling_step;
     } else {

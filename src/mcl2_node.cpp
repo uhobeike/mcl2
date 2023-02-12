@@ -143,8 +143,8 @@ void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
   header.stamp.nanosec = ros_clock_.now().nanoseconds();
   particles.set__header(header);
 
-  particles.particles.resize(mcl_->particles_.size());
-  for (auto i = 0; i < mcl_->particles_.size(); ++i) {
+  particles.particles.resize(500);
+  for (auto i = 0; i < 500; ++i) {
     particles.particles[i].pose.position.x = mcl_->particles_[i].pose.position.x;
     particles.particles[i].pose.position.y = mcl_->particles_[i].pose.position.y;
     tf2::Quaternion q;
@@ -164,14 +164,14 @@ void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr 
   odom_frame_ = "odom";
   robot_frame_ = "base_footprint";
 
-  alpha1_ = 0.2;
-  alpha2_ = 0.2;
-  alpha3_ = 0.2;
-  alpha4_ = 0.03;
+  alpha1_ = 2.0;
+  alpha2_ = 1.0;
+  alpha3_ = 0.1;
+  alpha4_ = 0.1;
 
   particle_size_ = 500;
 
-  likelihood_dist_ = 20.0;
+  likelihood_dist_ = 10.0;
 
   mcl_.reset();
   mcl_ = std::make_shared<mcl::Mcl>(

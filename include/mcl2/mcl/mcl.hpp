@@ -23,10 +23,10 @@ public:
 
   void release_pointers();
 
-  std::unique_ptr<LikelihoodField> likelihood_field_;
-  std::unique_ptr<MotionModel> motion_model_;
-  std::unique_ptr<ObservationModel> observation_model_;
-  std::unique_ptr<Resampling> resampling_;
+  std::shared_ptr<LikelihoodField> likelihood_field_;
+  std::shared_ptr<MotionModel> motion_model_;
+  std::shared_ptr<ObservationModel> observation_model_;
+  std::shared_ptr<Resampling> resampling_;
 
   void initParticles(double ini_pose_x, double ini_pose_y, double ini_pose_yaw, int particle_size);
 

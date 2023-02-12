@@ -3,7 +3,7 @@
 namespace mcl
 {
 ObservationModel::ObservationModel(
-  std::unique_ptr<mcl::LikelihoodField> likelihood_field, float angle_min, float angle_max,
+  std::shared_ptr<mcl::LikelihoodField> likelihood_field, float angle_min, float angle_max,
   float angle_increment, float range_min, float range_max)
 : likelihood_field_(std::move(likelihood_field))
 {
@@ -53,19 +53,20 @@ void ObservationModel::update(std::vector<Particle> & particles, std::vector<flo
     sum_score += particle_weight;
   }
 
-  std::cout << sum_score / (particles.size() * scan_.ranges.size()) << "\n";
   std::cout << "Done ObservationModel::update."
             << "\n";
 }
 
 double ObservationModel::calculateParticleWeight(const Particle p)
 {
+  // std::cout << "Run ObservationModel::calculateParticleWeight."
+  //           << "\n";
   std::vector<double> hit_xy;
   double particle_weight = 0.;
   double scan_angle_increment = scan_.angle_increment;
   for (auto scan_range : scan_.ranges) {
     ++scan_angle_increment;
-    if (scan_range == INFINITY) continue;
+    if (scan_range == INFINITY || scan_range == NAN) continue;
 
     hit_xy.clear();
     hit_xy.push_back(
@@ -74,13 +75,18 @@ double ObservationModel::calculateParticleWeight(const Particle p)
       p.pose.position.y + scan_range * sin(p.pose.euler.yaw + getRadian(scan_angle_increment)));
     particle_weight += getProbFromLikelihoodMap(hit_xy.at(0), hit_xy.at(1));
   }
+
+  // std::cout << "Done ObservationModel::calculateParticleWeight."
+  //           << "\n";
   return particle_weight;
 }
 
 double ObservationModel::getProbFromLikelihoodMap(double x, double y)
 {
+  // std::cout << "Done ObservationModel::getProbFromLikelihoodMap."
+  //           << "\n";
   return likelihood_field_->data_
-           [likelihood_field_->height_ *
+           [likelihood_field_->width_ *
               (likelihood_field_->height_ -
                (floor(std::negate<double>()(y) / likelihood_field_->resolution_) +
                 (likelihood_field_->width_ * 0.5) -

@@ -14,7 +14,7 @@ class ObservationModel
 {
 public:
   ObservationModel(
-    std::unique_ptr<mcl::LikelihoodField> likelihood_field, float angle_min, float angle_max,
+    std::shared_ptr<mcl::LikelihoodField> likelihood_field, float angle_min, float angle_max,
     float angle_increment, float range_min, float range_max);
   ~ObservationModel();
 
@@ -28,7 +28,7 @@ public:
 
   inline double getRadian(double degree) { return degree * M_PI / 180; }
 
-  std::unique_ptr<mcl::LikelihoodField> likelihood_field_;
+  std::shared_ptr<mcl::LikelihoodField> likelihood_field_;
   Scan scan_;
 };
 }  // namespace mcl
