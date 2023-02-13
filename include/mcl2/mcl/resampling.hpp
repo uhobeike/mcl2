@@ -27,7 +27,7 @@ public:
   std::random_device seed_gen_;
   std::mt19937 engine_;
 
-  int particle_size_;
+  long unsigned int particle_size_;
 };
 }  // namespace mcl
 

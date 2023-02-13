@@ -30,8 +30,8 @@ LikelihoodField::~LikelihoodField(){};
 
 void LikelihoodField::createLikelihoodField()
 {
-  for (auto y = 0; y < width_; y++)
-    for (auto x = 0; x < height_; x++)
+  for (uint32_t y = 0; y < width_; y++)
+    for (uint32_t x = 0; x < height_; x++)
       if (data_[width_ * (height_ - y - 1) + x] == 100) {
         calculateLikelihood(x, y);
       }
@@ -68,6 +68,6 @@ double LikelihoodField::calculateProb(double stochastic_variable, double likelih
 
 double LikelihoodField::normalizePdf(double max_pdf, double pdf) { return (pdf / max_pdf) * 100; }
 
-bool LikelihoodField::getLikelihoodField(std::vector<int8_t> & data) { data = data_; }
+void LikelihoodField::getLikelihoodField(std::vector<int8_t> & data) { data = data_; }
 
 }  // namespace mcl

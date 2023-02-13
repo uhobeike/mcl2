@@ -23,7 +23,7 @@ public:
     double stochastic_variable, double likelihood_dist);  // 尤度場作成に必要な確率を求める
   double normalizePdf(double max_pdf, double pdf);  // 足して1になるように確率を修正する
 
-  bool getLikelihoodField(std::vector<int8_t> & data);  // 尤度場を渡す
+  void getLikelihoodField(std::vector<int8_t> & data);  // 尤度場を渡す
 
   double likelihood_dist_;    // 尤度場の距離
   uint32_t width_;            // 受け取ったマップのwidth
