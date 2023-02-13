@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 Tatuhiro Ikebe <beike315@icloud.com>
+// SPDX-FileCopyrightText: 2023 Tatsuhiro Ikebe <beike315@icloud.com>
 // SPDX-License-Identifier: GPL-3.0
 
 #include "mcl2/mcl/motionModel.hpp"
