@@ -21,5 +21,6 @@ jobs:
           mkdir ../catkin_ws/src -p
           cp -r ./* ../catkin_ws/src
           cd ../catkin_ws
+          rosdep update
           rosdep install -r -y --from-paths --ignore-src ./ 
           colcon  build --symlink-install  
