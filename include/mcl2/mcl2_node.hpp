@@ -70,31 +70,36 @@ private:
                       particles);  // MCLのパーティクルからROS 2のパーティクルに置き換える
   geometry_msgs::msg::PoseStamped getMclPose(const Particle particle);
 
-  inline void publishParticles(nav2_msgs::msg::ParticleCloud particles)
-  {
-    particle_cloud_pub_->publish(particles);
-  };  // ROS 2のパーティクルをパブリッシュする
-  inline void publishMclPose(geometry_msgs::msg::PoseStamped mcl_pose)
-  {
-    mcl_pose_publisher_->publish(mcl_pose);
-  };  // ROS 2のパーティクルをパブリッシュする
-  inline void publishMarginalLikelihood(const float marginal_likelihood)
-  {
-    std_msgs::msg::Float32 msg;
-    msg.data = marginal_likelihood;
-    marginal_likelihood_publisher_->publish(msg);
-  };  // ROS 2のパーティクルをパブリッシュする
-  inline void publishParticlesScanMatchPoint(
-    const visualization_msgs::msg::MarkerArray particles_scan_match_point)
-  {
-    particles_scan_match_point_publisher_->publish(particles_scan_match_point);
-  };  // ROS 2のパーティクルをパブリッシュする
   visualization_msgs::msg::MarkerArray createSphereMarkerArray(
     const std::vector<std::vector<double>> particles_scan_match_point);
   void transformMapToOdom();  // 推定した姿勢からマップ座標系オドメトリー座標系間の変換を行う
   void getCurrentRobotPose(geometry_msgs::msg::PoseStamped &
                              current_pose);  // オドメトリー座標系でのロボット姿勢を取得する
-  void loopMcl();                            // MClのループ
+  inline void publishParticles  // ROS 2のパーティクルをパブリッシュする
+    (nav2_msgs::msg::ParticleCloud particles)
+  {
+    particle_cloud_pub_->publish(particles);
+  };
+  inline void publishMclPose  // 推定した姿勢をパブリッシュする
+    (geometry_msgs::msg::PoseStamped mcl_pose)
+  {
+    mcl_pose_publisher_->publish(mcl_pose);
+  };
+  inline void publishMarginalLikelihood  // 周辺尤度をパブリッシュする
+    (const float marginal_likelihood)
+  {
+    std_msgs::msg::Float32 msg;
+    msg.data = marginal_likelihood;
+    marginal_likelihood_publisher_->publish(msg);
+  };
+  inline void
+    publishParticlesScanMatchPoint  // 各パーティクルのスキャンと尤度場のマッチポイントをパブリッシュする
+    (const visualization_msgs::msg::MarkerArray particles_scan_match_point)
+  {
+    particles_scan_match_point_publisher_->publish(particles_scan_match_point);
+  };
+
+  void loopMcl();  // MClのループ
 
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
