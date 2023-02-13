@@ -26,5 +26,6 @@ jobs:
           cp -r ./* ../catkin_ws/src
           cd ../catkin_ws
           rosdep update
-          rosdep install -r -y --from-paths --ignore-src ./ 
+          rosdep install -r -y --from-paths --ignore-src ./
+          source /opt/ros/humble/setup.bash
           colcon  build --symlink-install  
