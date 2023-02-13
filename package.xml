@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>The mcl2 package</description>
   <maintainer email="beike315@icloud.com">Tatsuhiro Ikebe</maintainer>
-  <license>Apache-2.0</license>
+  <license>LGPL</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
