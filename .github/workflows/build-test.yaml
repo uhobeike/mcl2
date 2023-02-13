@@ -16,6 +16,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       
+      - name: Apt update
+        run: |
+          sudo apt update -y
+
       - name: Build Test
         run: |
           mkdir ../catkin_ws/src -p
