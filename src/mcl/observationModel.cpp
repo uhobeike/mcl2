@@ -55,6 +55,7 @@ void ObservationModel::update(std::vector<Particle> & particles, std::vector<flo
 
   setScan(scan_data);
 
+  particles_scan_match_point_.clear();
   double sum_score = 0.;
   for (auto & p : particles) {
     auto particle_weight = calculateParticleWeight(p);
@@ -85,6 +86,7 @@ double ObservationModel::calculateParticleWeight(const Particle p)
       p.pose.position.x + scan_range * cos(p.pose.euler.yaw + getRadian(scan_angle_increment)));
     hit_xy.push_back(
       p.pose.position.y + scan_range * sin(p.pose.euler.yaw + getRadian(scan_angle_increment)));
+    particles_scan_match_point_.push_back(hit_xy);
     particle_weight += getProbFromLikelihoodMap(hit_xy.at(0), hit_xy.at(1));
   }
 

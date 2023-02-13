@@ -36,6 +36,7 @@ public:
   Scan scan_;
 
   float marginal_likelihood_;
+  std::vector<std::vector<double>> particles_scan_match_point_;
 };
 }  // namespace mcl
 

@@ -39,6 +39,10 @@ public:
   {
     return observation_model_->marginal_likelihood_;
   }  // 周辺尤度を渡す
+  inline std::vector<std::vector<double>> getParticlesScanMatchPoint()
+  {
+    return observation_model_->particles_scan_match_point_;
+  }  // 各パーティクルのスキャンと尤度場のマッチポイントを渡す
 
   std::vector<Particle> particles_;
 };

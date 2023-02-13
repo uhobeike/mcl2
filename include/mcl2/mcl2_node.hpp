@@ -46,7 +46,8 @@ private:
   // パブリッシャの登録
   rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr particle_cloud_pub_;
   rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr likelihood_map_pub_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
+    particles_scan_match_point_publisher_;
   rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr marginal_likelihood_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr mcl_pose_publisher_;
 
@@ -77,13 +78,19 @@ private:
   {
     mcl_pose_publisher_->publish(mcl_pose);
   };  // ROS 2のパーティクルをパブリッシュする
-
-  inline void publishMarginalLikelihood(const float MarginalLikelihood)
+  inline void publishMarginalLikelihood(const float marginal_likelihood)
   {
     std_msgs::msg::Float32 msg;
-    msg.data = MarginalLikelihood;
+    msg.data = marginal_likelihood;
     marginal_likelihood_publisher_->publish(msg);
-  };                          // ROS 2のパーティクルをパブリッシュする
+  };  // ROS 2のパーティクルをパブリッシュする
+  inline void publishParticlesScanMatchPoint(
+    const visualization_msgs::msg::MarkerArray particles_scan_match_point)
+  {
+    particles_scan_match_point_publisher_->publish(particles_scan_match_point);
+  };  // ROS 2のパーティクルをパブリッシュする
+  visualization_msgs::msg::MarkerArray createSphereMarkerArray(
+    const std::vector<std::vector<double>> particles_scan_match_point);
   void transformMapToOdom();  // 推定した姿勢からマップ座標系オドメトリー座標系間の変換を行う
   void getCurrentRobotPose(geometry_msgs::msg::PoseStamped &
                              current_pose);  // オドメトリー座標系でのロボット姿勢を取得する

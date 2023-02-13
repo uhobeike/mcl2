@@ -37,7 +37,7 @@ Mcl2Node::Mcl2Node(const rclcpp::NodeOptions & options)
   setParam();
   getParam();
 }
-Mcl2Node::~Mcl2Node() { RCLCPP_INFO(this->get_logger(), "Run Mcl2Node done."); }
+Mcl2Node::~Mcl2Node() { RCLCPP_INFO(this->get_logger(), "Done Mcl2Node."); }
 
 void Mcl2Node::initPubSub()
 {
@@ -45,7 +45,8 @@ void Mcl2Node::initPubSub()
 
   particle_cloud_pub_ = create_publisher<nav2_msgs::msg::ParticleCloud>("particle_cloud", 2);
   likelihood_map_pub_ = create_publisher<nav_msgs::msg::OccupancyGrid>("likelihood_map", 2);
-  marker_array_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("mcl_match", 2);
+  particles_scan_match_point_publisher_ =
+    create_publisher<visualization_msgs::msg::MarkerArray>("mcl_match", 2);
   marginal_likelihood_publisher_ =
     create_publisher<std_msgs::msg::Float32>("marginal_likelihood", 2);
   mcl_pose_publisher_ = create_publisher<geometry_msgs::msg::PoseStamped>("mcl_pose", 2);
@@ -265,6 +266,46 @@ geometry_msgs::msg::PoseStamped Mcl2Node::getMclPose(const Particle particle)
   return mcl_pose;
 }
 
+visualization_msgs::msg::MarkerArray Mcl2Node::createSphereMarkerArray(
+  const std::vector<std::vector<double>> particles_scan_match_point)
+{
+  int id = 0;
+  std::string name = "";
+  std_msgs::msg::Header header;
+  header.frame_id = map_frame_;
+  header.stamp.nanosec = ros_clock_.now().nanoseconds();
+
+  auto marker_array = visualization_msgs::msg::MarkerArray();
+  for (auto hit_xy : particles_scan_match_point) {
+    auto marker = visualization_msgs::msg::Marker();
+
+    marker.set__header(header);
+    marker.ns = name;
+    marker.id = id;
+    id++;
+
+    marker.type = visualization_msgs::msg::Marker::SPHERE;
+    marker.action = visualization_msgs::msg::Marker::ADD;
+
+    marker.scale.x = 0.1;
+    marker.scale.y = 0.1;
+    marker.scale.z = 0.1;
+
+    marker.color.a = 1.;
+    marker.color.r = 1.;
+    marker.color.g = 0.;
+    marker.color.b = 0.;
+
+    marker.pose.position.x = hit_xy[0];
+    marker.pose.position.y = hit_xy[1];
+    marker.pose.position.z = 0.2;
+
+    marker_array.markers.push_back(marker);
+  }
+
+  return marker_array;
+}
+
 void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
 {
   RCLCPP_INFO(get_logger(), "Run initMcl.");
@@ -296,6 +337,7 @@ void Mcl2Node::mcl_to_ros2()
   publishParticles(particles);
   publishMclPose(getMclPose(maximum_likelihood_particle_));
   publishMarginalLikelihood(mcl_->getMarginalLikelihood());
+  publishParticlesScanMatchPoint(createSphereMarkerArray(mcl_->getParticlesScanMatchPoint()));
 
   RCLCPP_INFO(get_logger(), "Done mcl_to_ros2.");
 }
