@@ -110,14 +110,14 @@ void Mcl2Node::setParam()
 
   declare_parameter("particle_size", 500);
 
-  declare_parameter("alpha_trans_trans", 2.0);
-  declare_parameter("alpha_trans_rotate", 0.2);
-  declare_parameter("alpha_rotate_trans", 0.03);
-  declare_parameter("alpha_rotate_rotate", 0.05);
+  declare_parameter("alpha_trans_trans", 1.0);
+  declare_parameter("alpha_trans_rotate", 0.03);
+  declare_parameter("alpha_rotate_trans", 0.3);
+  declare_parameter("alpha_rotate_rotate", 0.03);
 
   declare_parameter("likelihood_dist", 5.0);
 
-  declare_parameter("loop_mcl_hz", 2.0);
+  declare_parameter("loop_mcl_hz", 10.0);
 
   declare_parameter("publish_particles_scan_match_point", false);
 

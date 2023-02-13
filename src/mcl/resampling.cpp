@@ -38,7 +38,7 @@ void Resampling::systematicSampling(std::vector<Particle> & particles)
   std::vector<Particle> new_particles;
   while (new_particles.size() <= particle_size_) {
     if (systematic_sampling_step < particles_weight_sum[index]) {
-      if (particles[index].weight < 0.2) {
+      if (particles[index].weight < 0.3) {
         ++index;
         continue;
       }
