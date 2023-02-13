@@ -16,14 +16,12 @@ LikelihoodField::LikelihoodField(
   resolution_(resolution),
   origin_x_(origin_x),
   origin_y_(origin_y),
-  data_(data),
-  create_likelihood_field_(false)
+  data_(data)
 {
   std::cout << "Create LikelihoodField."
             << "\n";
 
   createLikelihoodField();
-  create_likelihood_field_ = true;
 
   std::cout << "Done Create LikelihoodField."
             << "\n";

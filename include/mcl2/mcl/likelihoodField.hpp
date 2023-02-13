@@ -32,8 +32,6 @@ public:
   double origin_x_;           // 受け取ったマップの原点x
   double origin_y_;           // 受け取ったマップの原点y
   std::vector<int8_t> data_;  // 受け取ったマップの各画素の情報
-
-  bool create_likelihood_field_;
 };
 }  // namespace mcl
 
