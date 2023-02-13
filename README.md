@@ -1,4 +1,4 @@
-# Mcl2
+# Mcl2 [![build-test](https://github.com/uhobeike/mcl2/actions/workflows/build-test.yaml/badge.svg)](https://github.com/uhobeike/mcl2/actions/workflows/build-test.yaml)
 
 ## Overview
 Monte Carlo localizationのROS 2実装です。
