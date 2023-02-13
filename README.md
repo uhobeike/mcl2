@@ -43,7 +43,8 @@ Monte Carlo localizationのROS 2実装です。
 | `alpha_rotate_trans`  | `double`      | 回転で生じる直線の誤差 | 
 | `alpha_rotate_rotate` | `double`      | 回転で生じる回転の誤差 | 
 | `likelihood_dist`     | `double`      | 尤度場距離             | 
-| `loop_mcl_hz`         | `double`      | MClの周期              | 
+| `loop_mcl_hz`         | `double`      | MClの周期              |
+| `publish_particles_scan_match_point`         | `bool`        | 各パーティクルのスキャンと尤度場のマッチポイントの可視化（可視化すると、見応えがあるが非常に重い処理）              |
 
 ## LICENSE
 
