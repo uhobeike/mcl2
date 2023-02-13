@@ -47,17 +47,16 @@ void Mcl2Node::initPubSub()
   likelihood_map_pub_ = create_publisher<nav_msgs::msg::OccupancyGrid>("likelihood_map", 2);
   marker_array_publisher_ = create_publisher<visualization_msgs::msg::MarkerArray>("mcl_match", 2);
   marginal_likelihood_publisher_ =
-    create_publisher<std_msgs::msg::String>("marginal_likelihood", 2);
-  maximum_likelihood_particles_publisher_ =
-    create_publisher<nav2_msgs::msg::ParticleCloud>("maximum_likelihood_particles", 2);
+    create_publisher<std_msgs::msg::Float32>("marginal_likelihood", 2);
+  mcl_pose_publisher_ = create_publisher<geometry_msgs::msg::PoseStamped>("mcl_pose", 2);
 
   map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>(
     "map", rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable(),
     std::bind(&Mcl2Node::receiveMap, this, std::placeholders::_1));
-  initial_pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
-    "initialpose", 1, std::bind(&Mcl2Node::receiveInitialPose, this, std::placeholders::_1));
   scan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
     "scan", 1, std::bind(&Mcl2Node::receiveScan, this, std::placeholders::_1));
+  initial_pose_sub_ = create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
+    "initialpose", 1, std::bind(&Mcl2Node::receiveInitialPose, this, std::placeholders::_1));
 
   RCLCPP_INFO(get_logger(), "Done initPubSub done.");
 }
@@ -168,17 +167,14 @@ void Mcl2Node::transformMapToOdom()
 {
   RCLCPP_INFO(get_logger(), "Run initTf.");
 
-  Particle maximum_likelihood_particle;
-  maximum_likelihood_particle = mcl_->getMaximumLikelihoodParticles();
-
   geometry_msgs::msg::PoseStamped odom_to_map;
   try {
     tf2::Quaternion q;
-    q.setRPY(0, 0, maximum_likelihood_particle.pose.euler.yaw);
+    q.setRPY(0, 0, maximum_likelihood_particle_.pose.euler.yaw);
     tf2::Transform tmp_tf(
       q, tf2::Vector3(
-           maximum_likelihood_particle.pose.position.x, maximum_likelihood_particle.pose.position.y,
-           0.0));
+           maximum_likelihood_particle_.pose.position.x,
+           maximum_likelihood_particle_.pose.position.y, 0.0));
 
     geometry_msgs::msg::PoseStamped tmp_tf_stamped;
     tmp_tf_stamped.header.frame_id = robot_frame_;
@@ -245,6 +241,30 @@ void Mcl2Node::setParticles(nav2_msgs::msg::ParticleCloud & particles)
   RCLCPP_INFO(get_logger(), "Done setParticles.");
 }
 
+geometry_msgs::msg::PoseStamped Mcl2Node::getMclPose(const Particle particle)
+{
+  RCLCPP_INFO(get_logger(), "Run getMclPose.");
+
+  std_msgs::msg::Header header;
+  header.frame_id = "map";
+  header.stamp.nanosec = ros_clock_.now().nanoseconds();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = particle.pose.position.x;
+  pose.position.y = particle.pose.position.y;
+  tf2::Quaternion q;
+  q.setRPY(0, 0, particle.pose.euler.yaw);
+  pose.orientation = tf2::toMsg(q);
+
+  geometry_msgs::msg::PoseStamped mcl_pose;
+  mcl_pose.set__header(header);
+  mcl_pose.set__pose(pose);
+
+  RCLCPP_INFO(get_logger(), "Done getMclPose.");
+
+  return mcl_pose;
+}
+
 void Mcl2Node::initMcl(geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr pose)
 {
   RCLCPP_INFO(get_logger(), "Run initMcl.");
@@ -271,9 +291,10 @@ void Mcl2Node::mcl_to_ros2()
   RCLCPP_INFO(get_logger(), "Run mcl_to_ros2.");
 
   nav2_msgs::msg::ParticleCloud particles;
+  transformMapToOdom();
   setParticles(particles);
   publishParticles(particles);
-  transformMapToOdom();
+  publishMclPose(getMclPose(maximum_likelihood_particle_));
 
   RCLCPP_INFO(get_logger(), "Done mcl_to_ros2.");
 }
@@ -298,6 +319,7 @@ void Mcl2Node::loopMcl()
 
       mcl_->resampling_->resampling(mcl_->particles_);
 
+      mcl_->getMaximumLikelihoodParticle(maximum_likelihood_particle_);
       past_pose_ = current_pose_;
 
       mcl_to_ros2();

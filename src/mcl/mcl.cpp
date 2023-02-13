@@ -58,7 +58,7 @@ void Mcl::initParticles(
             << "\n";
 }
 
-Particle Mcl::getMaximumLikelihoodParticles()
+Particle Mcl::getMaximumLikelihoodParticle(Particle & particle)
 {
   double max_likelihood;
   bool once_flag = true;
@@ -77,7 +77,7 @@ Particle Mcl::getMaximumLikelihoodParticles()
       cnt++;
     }
 
-  return maximum_likelihood_particles[0];
+  particle = maximum_likelihood_particles[0];
 }
 
 void Mcl::release_pointers()

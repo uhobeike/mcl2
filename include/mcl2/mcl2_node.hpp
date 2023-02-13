@@ -21,6 +21,7 @@
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
+#include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -37,18 +38,17 @@ public:
 
 private:
   // サブスクライバの登録
-  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::ConstSharedPtr
-    initial_pose_sub_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::ConstSharedPtr map_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::ConstSharedPtr scan_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::ConstSharedPtr
+    initial_pose_sub_;
 
   // パブリッシャの登録
   rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr particle_cloud_pub_;
   rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr likelihood_map_pub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_publisher_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr marginal_likelihood_publisher_;
-  rclcpp::Publisher<nav2_msgs::msg::ParticleCloud>::SharedPtr
-    maximum_likelihood_particles_publisher_;
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr marginal_likelihood_publisher_;
+  rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr mcl_pose_publisher_;
 
   rclcpp::TimerBase::SharedPtr mcl_loop_timer_;  // MClのループ用のタイマー
 
@@ -67,11 +67,16 @@ private:
   void mcl_to_ros2();  // MClからROS 2の橋渡し的なことをする
   void setParticles(nav2_msgs::msg::ParticleCloud &
                       particles);  // MCLのパーティクルからROS 2のパーティクルに置き換える
-  inline void publishParticles(
-    nav2_msgs::msg::ParticleCloud particles)  // ROS 2のパーティクルをパブリッシュする
+  geometry_msgs::msg::PoseStamped getMclPose(const Particle particle);
+
+  inline void publishParticles(nav2_msgs::msg::ParticleCloud particles)
   {
     particle_cloud_pub_->publish(particles);
-  };
+  };  // ROS 2のパーティクルをパブリッシュする
+  inline void publishMclPose(geometry_msgs::msg::PoseStamped mcl_pose)
+  {
+    mcl_pose_publisher_->publish(mcl_pose);
+  };                          // ROS 2のパーティクルをパブリッシュする
   void transformMapToOdom();  // 推定した姿勢からマップ座標系オドメトリー座標系間の変換を行う
   void getCurrentRobotPose(geometry_msgs::msg::PoseStamped &
                              current_pose);  // オドメトリー座標系でのロボット姿勢を取得する
@@ -93,6 +98,8 @@ private:
 
   geometry_msgs::msg::PoseStamped current_pose_, past_pose_;  // 現在の姿勢、現在より一個前の姿勢
   double delta_x_, delta_y_, delta_yaw_;  // 現在の姿勢と現在の姿勢を比較したときの各差分
+
+  Particle maximum_likelihood_particle_;
 
   // Mcl2用のパラメータ
   std::string map_frame_, odom_frame_, robot_frame_;  // 各座標系

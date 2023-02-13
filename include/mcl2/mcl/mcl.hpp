@@ -33,8 +33,8 @@ public:
 
   void initParticles(
     double ini_pose_x, double ini_pose_y, double ini_pose_yaw,
-    int particle_size);                      // パーティクルの初期化をする
-  Particle getMaximumLikelihoodParticles();  // 最尤なパーティクルを渡す
+    int particle_size);  // パーティクルの初期化をする
+  Particle getMaximumLikelihoodParticle(Particle & particle);  // 最尤なパーティクルを渡す
 
   std::vector<Particle> particles_;
 };
