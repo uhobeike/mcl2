@@ -23,6 +23,7 @@ void Resampling::resampling(std::vector<Particle> & particles)
             << "\n";
 }
 
+// 詳解 確率ロボティクス p.131
 void Resampling::systematicSampling(std::vector<Particle> & particles)
 {
   std::vector<double> particles_weight_sum;

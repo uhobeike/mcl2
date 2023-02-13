@@ -169,6 +169,7 @@ void Mcl2Node::initTf()
   RCLCPP_INFO(get_logger(), "Done initTf.");
 }
 
+// https://github.com/ros-planning/navigation2/blob/ef4de1527997c3bd813afe0c6296ff65e05700e0/nav2_amcl/src/amcl_node.cpp#L975-L1016
 void Mcl2Node::transformMapToOdom()
 {
   RCLCPP_INFO(get_logger(), "Run initTf.");

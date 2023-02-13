@@ -34,6 +34,7 @@ void MotionModel::update(
   double delta_rotate_1_hat, delta_rotate_2_hat, delta_trans_hat;
   double delta_rotate_1_noise, delta_rotate_2_noise;
 
+  // https://github.com/ros-planning/navigation2/blob/ef4de1527997c3bd813afe0c6296ff65e05700e0/nav2_amcl/src/motion_model/differential_motion_model.cpp#L57-L61
   if (sqrt(delta_x * delta_x + delta_y * delta_y) < 0.01)
     delta_rotate_1 = 0.;
   else
@@ -41,6 +42,7 @@ void MotionModel::update(
   delta_trans = sqrt(delta_x * delta_x + delta_y * delta_y);
   delta_rotate_2 = diffMinAngle(delta_yaw, delta_rotate_1);
 
+  // https://github.com/ros-planning/navigation2/blob/ef4de1527997c3bd813afe0c6296ff65e05700e0/nav2_amcl/src/motion_model/differential_motion_model.cpp#L75-L80
   delta_rotate_1_noise =
     std::min(fabs(diffMinAngle(delta_rotate_1, 0.)), fabs(diffMinAngle(delta_rotate_1, M_PI)));
   delta_rotate_2_noise =
