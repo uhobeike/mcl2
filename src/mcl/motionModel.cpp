@@ -79,8 +79,8 @@ double MotionModel::drawNoise(double sigma)
 
 double MotionModel::diffMinAngle(double angle1, double angle2)
 {
-  normalizeAngle(angle1, true);
-  normalizeAngle(angle2, true);
+  angle1 = normalizeAngle(angle1);
+  angle2 = normalizeAngle(angle2);
   double diff_angle_1 = angle1 - angle2;
   double diff_angle_2 = 2 * M_PI - fabs(diff_angle_1);
 

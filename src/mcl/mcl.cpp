@@ -58,7 +58,7 @@ void Mcl::initParticles(
             << "\n";
 }
 
-Particle Mcl::getMaximumLikelihoodParticle(Particle & particle)
+void Mcl::getMaximumLikelihoodParticle(Particle & particle)
 {
   double max_likelihood;
   bool once_flag = true;
