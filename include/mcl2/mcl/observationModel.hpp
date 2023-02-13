@@ -34,6 +34,8 @@ public:
 
   std::shared_ptr<mcl::LikelihoodField> likelihood_field_;
   Scan scan_;
+
+  float marginal_likelihood_;
 };
 }  // namespace mcl
 

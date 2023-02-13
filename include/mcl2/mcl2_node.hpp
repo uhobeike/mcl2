@@ -76,6 +76,13 @@ private:
   inline void publishMclPose(geometry_msgs::msg::PoseStamped mcl_pose)
   {
     mcl_pose_publisher_->publish(mcl_pose);
+  };  // ROS 2のパーティクルをパブリッシュする
+
+  inline void publishMarginalLikelihood(const float MarginalLikelihood)
+  {
+    std_msgs::msg::Float32 msg;
+    msg.data = MarginalLikelihood;
+    marginal_likelihood_publisher_->publish(msg);
   };                          // ROS 2のパーティクルをパブリッシュする
   void transformMapToOdom();  // 推定した姿勢からマップ座標系オドメトリー座標系間の変換を行う
   void getCurrentRobotPose(geometry_msgs::msg::PoseStamped &

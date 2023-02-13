@@ -295,6 +295,7 @@ void Mcl2Node::mcl_to_ros2()
   setParticles(particles);
   publishParticles(particles);
   publishMclPose(getMclPose(maximum_likelihood_particle_));
+  publishMarginalLikelihood(mcl_->getMarginalLikelihood());
 
   RCLCPP_INFO(get_logger(), "Done mcl_to_ros2.");
 }

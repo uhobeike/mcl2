@@ -8,7 +8,7 @@ namespace mcl
 ObservationModel::ObservationModel(
   std::shared_ptr<mcl::LikelihoodField> likelihood_field, float angle_min, float angle_max,
   float angle_increment, float range_min, float range_max)
-: likelihood_field_(std::move(likelihood_field))
+: likelihood_field_(std::move(likelihood_field)), marginal_likelihood_(0.)
 {
   std::cout << "Run ObservationModel::ObservationModel."
             << "\n";
@@ -62,6 +62,7 @@ void ObservationModel::update(std::vector<Particle> & particles, std::vector<flo
     p.weight *= particle_weight;
     sum_score += particle_weight;
   }
+  marginal_likelihood_ = sum_score / (particles.size() * scan_.ranges.size());
 
   std::cout << "Done ObservationModel::update."
             << "\n";
