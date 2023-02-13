@@ -119,6 +119,8 @@ void Mcl2Node::setParam()
 
   declare_parameter("loop_mcl_hz", 2.0);
 
+  declare_parameter("publish_particles_scan_match_point", false);
+
   RCLCPP_INFO(get_logger(), "Done setParam.");
 }
 void Mcl2Node::getParam()
@@ -140,6 +142,9 @@ void Mcl2Node::getParam()
 
   int loop_mcl_hz = 1000 / get_parameter("loop_mcl_hz").get_value<double>();
   loop_mcl_ms_ = std::chrono::milliseconds{loop_mcl_hz};
+
+  publish_particles_scan_match_point_ =
+    get_parameter("publish_particles_scan_match_point").get_value<bool>();
 
   RCLCPP_INFO(get_logger(), "Done getParam.");
 }
@@ -337,7 +342,8 @@ void Mcl2Node::mcl_to_ros2()
   publishParticles(particles);
   publishMclPose(getMclPose(maximum_likelihood_particle_));
   publishMarginalLikelihood(mcl_->getMarginalLikelihood());
-  publishParticlesScanMatchPoint(createSphereMarkerArray(mcl_->getParticlesScanMatchPoint()));
+  if (publish_particles_scan_match_point_)
+    publishParticlesScanMatchPoint(createSphereMarkerArray(mcl_->getParticlesScanMatchPoint()));
 
   RCLCPP_INFO(get_logger(), "Done mcl_to_ros2.");
 }

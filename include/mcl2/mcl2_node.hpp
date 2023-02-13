@@ -121,6 +121,8 @@ private:
   int particle_size_;                                 // パーティクルのサイズ
   double likelihood_dist_;                            // 尤度場の距離
   std::chrono::milliseconds loop_mcl_ms_;             // MClの実行周期
+  bool
+    publish_particles_scan_match_point_;  // 各パーティクルのスキャンと尤度場のマッチポイントをパブリッシュするか
 };
 }  // namespace mcl2
 
