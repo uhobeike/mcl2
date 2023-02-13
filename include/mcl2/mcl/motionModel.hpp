@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Tatuhiro Ikebe <beike315@icloud.com>
+// SPDX-License-Identifier: GPL-3.0
+
 #ifndef MCL2__MOTIONMODEL_HPP_
 #define MCL2__MOTIONMODEL_HPP_
 

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Tatuhiro Ikebe <beike315@icloud.com>
+// SPDX-License-Identifier: GPL-3.0
+
 #ifndef MCL2__MCL2_NODE_HPP_
 #define MCL2__MCL2_NODE_HPP_
 
